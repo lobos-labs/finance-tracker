@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security problem privately
+    url: https://github.com/lobos-labs/finance-tracker/security/advisories/new
+    about: Not as a public issue. SECURITY.md says what to include.

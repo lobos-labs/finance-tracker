@@ -1,0 +1,348 @@
+# The release: a v* tag builds the Windows installer and the Mac apps (arm64 and x64) with
+# npm run dist:open (scripts/dist-open.cjs) and puts them on a draft GitHub release for that tag, with
+# latest.yml and latest-mac.yml, the update feed the app reads from
+# https://github.com/<owner>/<repo>/releases/latest/download (src/main/updateFeed.ts). The feed follows
+# the latest published release that is not a prerelease, so publishing the draft is what ships an
+# update. Run it by hand from a tag (Run workflow, then the tag under "Use workflow from") to rebuild
+# that tag's draft. From a branch it would make the draft for the version in package.json, but the
+# tag rule on the environment below refuses a branch's run, as it should.
+#
+# Signing runs only when its settings exist, and the release notes say how each platform was signed.
+# Every signing setting is a secret of the environment "signing", which both build jobs run in: give
+# it required reviewers and a deployment rule for tags v* (Settings → Environments), so a release's
+# build waits for approval and nothing but a tag's run can sign.
+#   Windows  Certum's SimplySign cloud certificate, issued to Lobos Labs, Inc., through ssign (crates.io,
+#            built here with cargo install --locked): CERTUM_EMAIL and CERTUM_OTP (the TOTP seed or its
+#            otpauth:// URI). scripts/sign-win.cjs, electron-builder's sign hook, signs each file after
+#            the fuses are flipped: the app, the SQLite driver's .node, Electron's unsigned DLLs, the
+#            uninstaller and the installer. Without them the installer is unsigned.
+#   macOS    A Developer ID Application certificate and notarization through an App Store Connect API
+#            key: MAC_CERTIFICATE_P12_BASE64 and MAC_CERTIFICATE_PASSWORD; APPLE_API_KEY_P8_BASE64,
+#            APPLE_API_KEY_ID and APPLE_API_ISSUER. Without the certificate the apps are signed ad hoc.
+#
+# Four jobs, each with only the permissions it needs: check (the tag against package.json), windows
+# and mac (build, test, sign; contents: read), and release, the only one that can write: the draft
+# release and its assets.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+# Every job sets its own.
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FINANCE_TRACKER_UPDATE_URL: https://github.com/${{ github.repository }}/releases/latest/download
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # electron-updater compares versions: the tag, package.json and the feed must agree.
+      - name: The tag and package.json's version
+        id: version
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          version="$(node -p 'require("./package.json").version')"
+          if [ "$REF_TYPE" = tag ] && [ "$REF_NAME" != "v$version" ]; then
+            echo "::error::The tag is $REF_NAME but package.json's version is $version: tag v$version, or change the version first."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "Release v$version from $GITHUB_REF ($GITHUB_SHA)"
+
+  windows:
+    needs: check
+    runs-on: windows-latest
+    environment: signing
+    timeout-minutes: 100
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      # ssign's version, built from crates.io with its own lockfile.
+      SSIGN_VERSION: 0.1.11
+    steps:
+      # Before any action or package runs: signing is all set or not at all.
+      - name: Signing settings
+        id: signing
+        env:
+          EMAIL: ${{ secrets.CERTUM_EMAIL }}
+          OTP: ${{ secrets.CERTUM_OTP }}
+        run: |
+          if ([bool]$env:EMAIL -ne [bool]$env:OTP) { throw 'Windows signing needs both CERTUM_EMAIL and CERTUM_OTP (secrets of the environment signing), or neither.' }
+          $sign = [bool]$env:EMAIL
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "sign=$($sign.ToString().ToLower())"
+          "Windows signing: $(if ($sign) { 'Certum SimplySign through ssign, as Lobos Labs, Inc.' } else { 'none (no CERTUM_* secrets)' })"
+
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # No dependency cache in a job that can sign: npm ci fetches from the registry and checks every
+      # package against package-lock.json's hashes.
+      - name: Set up Node 26
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          package-manager-cache: false
+
+      # Built from source with the crate's own lockfile, never a downloaded binary.
+      - name: Install ssign ${{ env.SSIGN_VERSION }}
+        if: ${{ steps.signing.outputs.sign == 'true' }}
+        timeout-minutes: 15
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'ssign'
+          cargo install ssign --version $env:SSIGN_VERSION --locked --root $root
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $root 'bin')
+
+      # --ignore-scripts: no package's install script runs in a job that holds the signing secrets.
+      # Electron's binary, which the bytecode step runs, comes from its install.js: a download from
+      # GitHub's releases that can fail for a moment (a 504), so it is tried three times.
+      - name: Install dependencies (no install scripts)
+        timeout-minutes: 15
+        run: |
+          npm.cmd ci --ignore-scripts
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          foreach ($try in 1..3) {
+            node node_modules/electron/install.js
+            if (-not $LASTEXITCODE) { break }
+            if ($try -lt 3) { Start-Sleep -Seconds 20 }
+          }
+          exit $LASTEXITCODE
+
+      - name: Typecheck
+        timeout-minutes: 10
+        run: npm.cmd run typecheck
+
+      # Some tests hold wall-clock budgets, which a busy shared runner can miss once: a failed run is run once
+      # more, and a real failure fails again.
+      - name: Unit tests
+        timeout-minutes: 70
+        run: |
+          npm.cmd test
+          if ($LASTEXITCODE) {
+            Write-Host '::warning::The unit tests failed once; running them again.'
+            npm.cmd test
+          }
+          exit $LASTEXITCODE
+
+      # The secrets reach this step alone; ssign reads them from the environment. Unset ones come through
+      # empty, which Windows drops.
+      - name: Build (npm run dist:open)
+        timeout-minutes: 30
+        env:
+          CERTUM_EMAIL: ${{ secrets.CERTUM_EMAIL }}
+          CERTUM_OTP: ${{ secrets.CERTUM_OTP }}
+          WIN_SIGN_PUBLISHER: ${{ steps.signing.outputs.sign == 'true' && 'Lobos Labs, Inc.' || '' }}
+        run: |
+          npm.cmd run dist:open
+          exit $LASTEXITCODE
+
+      - name: Upload the Windows assets
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-windows
+          path: |
+            dist/*.exe
+            dist/*.exe.blockmap
+            dist/latest.yml
+            dist/release-win32.json
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
+          overwrite: true
+
+  mac:
+    needs: check
+    # The repository variable MAC_RUNNER switches the image when macos-15's Apple silicon pool has no
+    # runner to give ("not acquired ... after multiple attempts"): macos-14 or macos-latest, say. Any
+    # Apple silicon image works; the x64 app is compiled under Rosetta.
+    runs-on: ${{ vars.MAC_RUNNER || 'macos-15' }}
+    environment: signing
+    timeout-minutes: 75
+    permissions:
+      contents: read
+    steps:
+      # The certificate and the API key go to files in the runner's temp folder, which electron-builder
+      # reads (CSC_LINK, APPLE_API_KEY); the password and the key's ids reach the build step alone.
+      - name: Signing settings
+        id: signing
+        env:
+          P12: ${{ secrets.MAC_CERTIFICATE_P12_BASE64 }}
+          P8: ${{ secrets.APPLE_API_KEY_P8_BASE64 }}
+          KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          set -euo pipefail
+          if [ -n "$P8$KEY_ID$ISSUER" ] && { [ -z "$P8" ] || [ -z "$KEY_ID" ] || [ -z "$ISSUER" ]; }; then
+            echo "::error::Notarizing needs all of APPLE_API_KEY_P8_BASE64, APPLE_API_KEY_ID and APPLE_API_ISSUER."
+            exit 1
+          fi
+          if [ -n "$P8" ] && [ -z "$P12" ]; then
+            echo "::error::Notarizing needs the Developer ID certificate too (MAC_CERTIFICATE_P12_BASE64): Apple notarizes only signed apps."
+            exit 1
+          fi
+          if [ -n "$P12" ]; then
+            printf '%s' "$P12" | base64 --decode > "$RUNNER_TEMP/developer-id.p12"
+            echo "CSC_LINK=$RUNNER_TEMP/developer-id.p12" >> "$GITHUB_ENV"
+          fi
+          if [ -n "$P8" ]; then
+            printf '%s' "$P8" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+            echo "APPLE_API_KEY=$RUNNER_TEMP/AuthKey.p8" >> "$GITHUB_ENV"
+          fi
+          echo "macOS signing: $([ -n "$P12" ] && echo 'Developer ID' || echo 'ad hoc (no certificate)'), $([ -n "$P8" ] && echo 'notarized' || echo 'not notarized')"
+
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node 26
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          package-manager-cache: false
+
+      # The x64 build compiles its bytecode with x64 Electron, under Rosetta on this Apple silicon runner.
+      - name: Rosetta
+        run: |
+          if arch -x86_64 /usr/bin/true 2>/dev/null; then echo 'Rosetta: installed'; else sudo softwareupdate --install-rosetta --agree-to-license; fi
+          arch -x86_64 /usr/bin/true
+
+      # Electron's download is tried three times here too.
+      - name: Install dependencies (no install scripts)
+        timeout-minutes: 15
+        run: |
+          npm ci --ignore-scripts
+          for try in 1 2 3; do
+            if node node_modules/electron/install.js; then break; fi
+            if [ "$try" = 3 ]; then exit 1; fi
+            sleep 20
+          done
+
+      # Both arches on this Apple silicon runner, so one latest-mac.yml names both zips. Unset secrets
+      # come through empty, which dist-open.cjs and electron-builder take as not set.
+      - name: Build (npm run dist:open)
+        timeout-minutes: 45
+        env:
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: npm run dist:open
+
+      - name: Remove the certificate and the API key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/developer-id.p12" "$RUNNER_TEMP/AuthKey.p8"
+
+      - name: Upload the Mac assets
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-mac
+          path: |
+            dist/*.dmg
+            dist/*.dmg.blockmap
+            dist/*.zip
+            dist/*.zip.blockmap
+            dist/latest-mac.yml
+            dist/release-darwin.json
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
+          overwrite: true
+
+  release:
+    needs: [check, windows, mac]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Download the assets
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: release-*
+          path: assets
+          merge-multiple: true
+
+      - name: Release notes
+        env:
+          TAG: ${{ needs.check.outputs.tag }}
+        run: |
+          node - <<'EOF'
+          const fs = require('fs')
+          const win = JSON.parse(fs.readFileSync('assets/release-win32.json', 'utf8'))
+          const mac = JSON.parse(fs.readFileSync('assets/release-darwin.json', 'utf8'))
+          const files = fs.readdirSync('assets').filter((n) => n !== 'release-win32.json' && n !== 'release-darwin.json')
+          const bad = files.filter((n) => /\s/.test(n))
+          if (bad.length) throw new Error(`asset names with spaces (GitHub would rename them and break the feed): ${bad.join(', ')}`)
+          for (const f of ['latest.yml', 'latest-mac.yml']) if (!files.includes(f)) throw new Error(`no ${f}`)
+          if (win.version !== mac.version || `v${win.version}` !== process.env.TAG) throw new Error(`versions differ: Windows ${win.version}, Mac ${mac.version}, tag ${process.env.TAG}`)
+          const pick = (re) => win.assets.concat(mac.assets).find((n) => re.test(n)) ?? '(missing)'
+          const lines = [
+            '## Downloads',
+            '',
+            `- Windows (x64): \`${pick(/\.exe$/)}\``,
+            `- macOS, Apple silicon: \`${pick(/-arm64\.dmg$/)}\``,
+            `- macOS, Intel: \`${pick(/-x64\.dmg$/)}\``,
+            '',
+            '## Signing',
+            '',
+            win.signing === 'ssign' || win.signing === 'signtool'
+              ? `- Windows: signed by ${win.signer}. The app updates itself from latest.yml, and only to an installer signed by ${win.signer}.`
+              : '- Windows: **not signed**. SmartScreen warns before it runs (More info, then Run anyway), and Smart App Control, where it is on, blocks it. The app updates itself from latest.yml, checking each download against the checksum there and not against a signature.',
+            mac.signing === 'developer-id'
+              ? `- macOS: signed by ${mac.signer}${mac.notarized ? ' and notarized by Apple' : ', **not notarized**: Gatekeeper refuses it until it is allowed in System Settings → Privacy & Security'}. ${mac.notarized ? 'The app updates itself from latest-mac.yml.' : ''}`.trim()
+              : '- macOS: **not signed with a Developer ID or notarized** (signed ad hoc). macOS refuses to open it at first; allow it in System Settings → Privacy & Security → Open Anyway. It cannot install an update itself (macOS installs one only for an app signed with a Developer ID): it says when a new version is out, and that version is a new download.',
+            ''
+          ]
+          fs.writeFileSync('notes.md', lines.join('\n'))
+          console.log(lines.join('\n'))
+          EOF
+          rm assets/release-win32.json assets/release-darwin.json
+          ls -la assets
+
+      # A draft for the tag: made, or its assets replaced while it is still a draft. A published release
+      # is never changed here.
+      - name: Draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.check.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if draft="$(gh release view "$TAG" --json isDraft --jq .isDraft 2>/dev/null)"; then
+            if [ "$draft" != true ]; then
+              echo "::error::$TAG is already published; this workflow changes drafts only."
+              exit 1
+            fi
+            gh release edit "$TAG" --notes-file notes.md
+            gh release upload "$TAG" assets/* --clobber
+          else
+            gh release create "$TAG" assets/* --draft --title "$TAG" --notes-file notes.md --target "$GITHUB_SHA"
+          fi
+          echo "Draft $TAG: $(gh release view "$TAG" --json url --jq .url)"

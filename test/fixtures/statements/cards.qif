@@ -1,0 +1,59 @@
+!Option:AutoSwitch
+!Account
+NVisa Rewards
+TCCard
+^
+NStore Card
+TCCard
+^
+!Clear:AutoSwitch
+!Account
+NVisa Rewards
+TCCard
+DQuicken export
+$-1,234.56
+/10/15'26
+^
+!Type:CCard
+D10/2'26
+T-54.12
+PTrader Joe's
+^
+D10/3'26
+T-40.00
+PShell
+^
+D10/4'26
+T-23.99
+PAmazon
+^
+D10/6'26
+T500.00
+PPayment - Thank You
+^
+!Account
+NStore Card
+TCCard
+^
+!Type:CCard
+D10/2'26
+T19.99
+PTarget
+^
+D10/4'26
+T35.00
+PTarget
+^
+D10/8'26
+T12.49
+PTarget
+^
+D10/10'26
+T-50.00
+PPayment
+^
+!Type:Cat
+NDining
+DRestaurants
+E
+^

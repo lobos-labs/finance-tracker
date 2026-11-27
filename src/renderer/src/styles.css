@@ -1,0 +1,6550 @@
+/*
+ * The theme:
+ * near-black ink surfaces (warm paper in light), copper accent, teal secondary,
+ * serif display numbers, mono labels, hairline dividers, sharp corners (max 4px).
+ *
+ * The ink scale runs from the page (950) to the text (50) in both themes, so a
+ * component names a role, not a shade. The light values follow
+ * prefers-color-scheme, which the app sets from Settings → Display
+ * (nativeTheme.themeSource) and the browser demo takes from the visitor.
+ * scripts/contrast.ts measures the pairs (test/theme-contrast.test.ts).
+ */
+:root {
+  color-scheme: dark;
+
+  --ink-950: #0a0a0b;
+  --ink-900: #141416;
+  --ink-800: #1c1c1f;
+  --ink-700: #1f1f22;
+  --ink-600: #2a2a2e;
+  --ink-500: #606066;
+  --ink-400: #86868b;
+  --ink-300: #9b9b9b;
+  --ink-200: #c9c9c4;
+  --ink-100: #e8e8e3;
+  --ink-50: #fafaf7;
+
+  --copper: #d4a574;
+  --copper-300: #e1bb8a;
+  --on-copper: var(--ink-950);
+  --teal: #4a9b8f;
+  --teal-400: #6ab3a6;
+  --pos: #4ade80;
+  --neg: #f87171;
+  --warn: #fbbf24;
+
+  /* Surfaces: cards over the page, the floating ones (modals, tooltips, toasts), the scrim and shadows. */
+  --card-1: rgba(20, 20, 22, 0.72);
+  --card-2: rgba(14, 14, 16, 0.72);
+  --panel-1: rgba(20, 20, 22, 0.86);
+  --panel-2: rgba(14, 14, 16, 0.86);
+  /* The card as one solid color: the halo around a chart label, the ring around a chart's dot. */
+  --card-solid: var(--ink-900);
+  --pop: var(--ink-900);
+  --toast: var(--ink-800);
+  --scrim: rgba(0, 0, 0, 0.6);
+  --shadow: rgba(0, 0, 0, 0.7);
+  --shadow-deep: rgba(0, 0, 0, 0.8);
+  /* A form field: its fill, and an edge at 3:1 against the card and the fill. */
+  --field: var(--ink-900);
+  --field-line: #636369;
+
+  /* Chart marks: the brand hues, nudged in OKLCH until they pass the
+     lightness, chroma, contrast and colorblind-separation checks on each
+     theme's surface (copper, teal, slate, plum on all pairs; blue beside them). */
+  --chart-copper: #be8441;
+  --chart-teal: #299a8b;
+  --chart-muted: #6a6a70;
+  --chart-slate: #878bcf;
+  --chart-plum: #9a4e8c;
+  /* Credits on the Taxes page: a blue that clears the chroma floor beside teal and copper. */
+  --chart-blue: #0171b4;
+  --chart-cursor: rgba(255, 255, 255, 0.03);
+
+  /* Derived from the tokens above, so they follow the theme. */
+  --copper-wash: color-mix(in srgb, var(--copper) 6%, transparent);
+  --copper-line: color-mix(in srgb, var(--copper) 30%, transparent);
+  --focus: color-mix(in srgb, var(--copper) 60%, transparent);
+  --well: color-mix(in srgb, var(--ink-950) 60%, transparent);
+  --row-hover: color-mix(in srgb, var(--ink-900) 90%, transparent);
+  --card-bg: linear-gradient(180deg, var(--card-1), var(--card-2));
+  --panel-bg: linear-gradient(180deg, var(--panel-1), var(--panel-2));
+
+  /* Aliases used by components. */
+  --good-text: var(--pos);
+  --bad-text: var(--neg);
+
+  --font-display: 'Source Serif 4 Variable', Georgia, serif;
+  --font-sans: 'Inter Variable', system-ui, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, Consolas, monospace;
+
+  --radius: 3px;
+  --topbar-h: 72px;
+  --sidebar-w: 232px;
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  font-feature-settings: 'ss01', 'cv05', 'cv11';
+  color: var(--ink-50);
+  background: var(--ink-950);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Light: warm paper, ink text, the copper and teal darkened for contrast. */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+
+    --ink-950: #f3eee5;
+    --ink-900: #eee9df;
+    --ink-800: #e7e0d4;
+    --ink-700: #d8cfbf;
+    --ink-600: #c4b9a6;
+    --ink-500: #8b8172;
+    --ink-400: #675e51;
+    --ink-300: #544b3f;
+    --ink-200: #40382e;
+    --ink-100: #2d271f;
+    --ink-50: #1b1712;
+
+    --copper: #8f5219;
+    --copper-300: #7d4612;
+    --on-copper: #fffaf2;
+    --teal: #2b7d70;
+    --teal-400: #276a5f;
+    --pos: #18703c;
+    --neg: #b3261e;
+    --warn: #a86400;
+
+    --card-1: rgba(253, 251, 247, 0.92);
+    --card-2: rgba(250, 247, 241, 0.92);
+    --panel-1: rgba(253, 251, 247, 0.97);
+    --panel-2: rgba(250, 247, 241, 0.97);
+    --card-solid: #fbf9f4;
+    --pop: #fffdf9;
+    --toast: #fffdf9;
+    --scrim: rgba(48, 38, 26, 0.32);
+    --shadow: rgba(70, 52, 30, 0.16);
+    --shadow-deep: rgba(70, 52, 30, 0.22);
+    --field: #fffdf9;
+    --field-line: #8b8172;
+
+    --chart-copper: #b77c39;
+    --chart-teal: #279887;
+    --chart-muted: #857b6c;
+    --chart-slate: #847fd2;
+    --chart-plum: #9b4a7f;
+    --chart-blue: #0068a6;
+    --chart-cursor: rgba(60, 40, 20, 0.05);
+
+    --focus: var(--copper);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--ink-950);
+  background-image:
+    radial-gradient(1200px 600px at 85% -10%, color-mix(in srgb, var(--copper) 7%, transparent), transparent 60%),
+    radial-gradient(900px 500px at 0% 100%, color-mix(in srgb, var(--teal) 5%, transparent), transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Film grain. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--copper-line);
+  color: var(--ink-50);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-600);
+  border-radius: 8px;
+  border: 2px solid var(--ink-950);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--ink-600) 60%, var(--ink-500));
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--ink-50);
+  letter-spacing: -0.015em;
+}
+
+/* ---------- type helpers ---------- */
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--copper);
+}
+
+.label-muted {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-400);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.muted {
+  color: var(--ink-400);
+}
+
+.small {
+  font-size: 12.5px;
+}
+
+.pos {
+  color: var(--pos);
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Up to two lines, for names in narrow lists where one cut-short line made them all look alike. */
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.link {
+  color: var(--copper);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--copper-line);
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  color: var(--copper-300);
+  text-decoration-color: currentColor;
+}
+
+/* ---------- shell ---------- */
+
+.app {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  height: 100vh;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--ink-700);
+  background: color-mix(in srgb, var(--ink-950) 92%, transparent);
+  min-height: 0;
+}
+
+/* The top bar that stands in for the sidebar at a phone's width (the end of this file); wider, the sidebar is there. */
+.shell-bar {
+  display: none;
+}
+
+.brand {
+  height: var(--topbar-h);
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--ink-700);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  color: var(--copper);
+  flex: none;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.brand-name .dot {
+  color: var(--copper);
+  padding: 0 1px;
+}
+
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px;
+}
+
+.nav-group-label {
+  padding: 22px 12px 8px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--ink-400);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  margin-bottom: 2px;
+  border: 0;
+  border-left: 2px solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--ink-200);
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.nav-item:hover {
+  background: var(--ink-900);
+  color: var(--ink-50);
+}
+
+.nav-item.active {
+  background: var(--ink-800);
+  color: var(--ink-50);
+  border-left-color: var(--copper);
+}
+
+.nav-item svg {
+  flex: none;
+}
+
+/* A group's header while its pages show beneath it. */
+.nav-item.within {
+  color: var(--ink-50);
+}
+
+.nav-chevron {
+  margin-left: auto;
+  color: var(--ink-500);
+  transition: transform 0.15s;
+}
+
+.nav-chevron.open {
+  transform: rotate(90deg);
+}
+
+/* A closed group's badge sits at the right, the chevron just after it. */
+.nav-badge + .nav-chevron {
+  margin-left: 6px;
+}
+
+.nav-item.nav-sub {
+  padding: 6px 12px 6px 39px;
+  font-size: 13px;
+  color: var(--ink-300);
+}
+
+.nav-item.nav-sub.active {
+  color: var(--ink-50);
+}
+
+.nav-badge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--copper);
+  color: var(--on-copper);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-footer {
+  flex: none;
+  border-top: 1px solid var(--ink-700);
+  padding: 16px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--ink-300);
+}
+
+.main {
+  overflow-y: auto;
+  /* The scrollbar's room is always kept, so short and long pages line up. */
+  scrollbar-gutter: stable;
+  min-width: 0;
+  position: relative;
+}
+
+/* Top bar doubles as the window's drag handle; the native min/max/close
+   buttons are overlaid at the top right, so reserve room for them. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 32px;
+  padding-right: max(32px, calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, calc(100vw - 150px)) + 24px));
+  background: color-mix(in srgb, var(--ink-950) 82%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--ink-700);
+  -webkit-app-region: drag;
+}
+
+.topbar :where(button, input, select, a, label) {
+  -webkit-app-region: no-drag;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.topbar .spacer {
+  flex: 1;
+}
+
+.page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 32px 64px;
+}
+
+/* ---------- money flow ---------- */
+
+.flow-hub {
+  cursor: pointer;
+}
+
+.flow-hub:hover text,
+.flow-hub:focus-visible text {
+  fill: var(--ink-50);
+}
+
+.flow-hub:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- panels ---------- */
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.015);
+}
+
+.card + .card {
+  margin-top: 16px;
+}
+
+.card .eyebrow {
+  margin-bottom: 6px;
+}
+
+.card h2 {
+  font-size: 19px;
+  margin: 0 0 4px;
+}
+
+.card .sub {
+  color: var(--ink-400);
+  font-size: 12.5px;
+  margin: 0 0 18px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.grid-2 > .card + .card {
+  margin-top: 0;
+}
+
+/* ---------- stat strip (hairline-separated tiles) ---------- */
+
+.stat-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--ink-700);
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.tile {
+  background: color-mix(in srgb, var(--ink-950) 94%, transparent);
+  padding: 20px 22px 18px;
+  transition: background 0.2s;
+}
+
+.tile:hover {
+  background: color-mix(in srgb, var(--ink-950) 50%, var(--ink-900));
+}
+
+.tile .label-muted {
+  margin-bottom: 14px;
+}
+
+.tile-value {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-50);
+}
+
+.tile-value.good {
+  color: var(--pos);
+}
+
+.tile-value.bad {
+  color: var(--neg);
+}
+
+.tile-sub,
+.delta {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-400);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.delta.good {
+  color: var(--pos);
+}
+
+.delta.bad {
+  color: var(--neg);
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 18px;
+  margin-top: 16px;
+  border-radius: var(--radius);
+  background: var(--copper-wash);
+  border: 1px solid var(--copper-line);
+  color: var(--ink-100);
+}
+
+.banner svg {
+  color: var(--copper);
+  flex: none;
+}
+
+.banner strong {
+  font-family: var(--font-mono);
+  color: var(--copper);
+  font-weight: 600;
+}
+
+.banner .spacer {
+  flex: 1;
+}
+
+/* ---------- controls ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--ink-600);
+  background: var(--ink-800);
+  color: var(--ink-50);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--ink-700);
+  border-color: var(--ink-500);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn.primary {
+  background: var(--copper);
+  border-color: transparent;
+  color: var(--on-copper);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: var(--copper-300);
+  border-color: transparent;
+}
+
+.btn.ghost {
+  background: none;
+  border-color: transparent;
+  color: var(--ink-200);
+}
+
+.btn.ghost:hover:not(:disabled) {
+  background: var(--ink-800);
+  border-color: transparent;
+  color: var(--ink-50);
+}
+
+.btn.danger {
+  color: var(--neg);
+}
+
+.btn.small {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.btn svg {
+  flex: none;
+}
+
+.btn.icon-btn {
+  width: 34px;
+  padding: 0;
+}
+
+.btn.small.icon-btn {
+  width: 28px;
+}
+
+.input,
+.select,
+.textarea {
+  height: 34px;
+  padding: 0 11px;
+  border-radius: 2px;
+  border: 1px solid var(--field-line);
+  background: var(--field);
+  color: var(--ink-50);
+  min-width: 0;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--ink-400);
+}
+
+.textarea {
+  height: auto;
+  padding: 9px 11px;
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.select option,
+.select optgroup {
+  background: var(--field);
+  color: var(--ink-50);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--copper) 10%, transparent);
+}
+
+:where(.btn, .nav-item, .bar-row, .link, .link-quiet, .row-name, .home-strip, .home-headline-text, .chip, .money-row.link-row, .sheet-row):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+input[type='checkbox'] {
+  accent-color: var(--copper);
+  width: 14px;
+  height: 14px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.toolbar .input[type='search'] {
+  width: 300px;
+}
+
+/* A select is as wide as its longest option; a long account name shouldn't stretch the row. */
+.toolbar .select {
+  max-width: 260px;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-200);
+  cursor: pointer;
+  user-select: none;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+.field .select,
+.field .input {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.month-switch {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius);
+  background: var(--ink-900);
+}
+
+.month-switch .btn {
+  border: 0;
+  background: none;
+  height: 32px;
+  width: 32px;
+  color: var(--ink-300);
+}
+
+.month-switch .btn:hover:not(:disabled) {
+  color: var(--ink-50);
+  background: var(--ink-800);
+}
+
+.month-input {
+  height: 32px;
+  width: 134px;
+  padding: 0 4px 0 8px;
+  border: 0;
+  background: none;
+  color: var(--ink-100);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.month-input:focus {
+  outline: none;
+  color: var(--ink-50);
+}
+
+.month-input::-webkit-calendar-picker-indicator {
+  opacity: 0.45;
+  cursor: pointer;
+}
+
+.month-dash {
+  color: var(--ink-400);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.month-label {
+  min-width: 150px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-100);
+  border-left: 1px solid var(--ink-700);
+  border-right: 1px solid var(--ink-700);
+  line-height: 32px;
+}
+
+/* ---------- lists ---------- */
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--ink-700);
+}
+
+.list-row:first-child {
+  border-top: 0;
+}
+
+.list-row .grow {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- table ---------- */
+
+.table-wrap {
+  background: var(--well);
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  overflow: clip;
+}
+
+/* Separate (not collapsed) borders so the sticky header keeps its divider. */
+table.txns {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.txns th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ink-700);
+  background: var(--ink-950);
+  position: sticky;
+  top: var(--topbar-h);
+  z-index: 5;
+}
+
+.txns td {
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--ink-700);
+  vertical-align: middle;
+  font-size: 13.5px;
+}
+
+.txns tr:last-child td {
+  border-bottom: 0;
+}
+
+.txns col.c-date {
+  width: 140px;
+}
+
+.txns col.c-category {
+  width: 230px;
+}
+
+.txns col.c-bucket {
+  width: 140px;
+}
+
+.txns col.c-account {
+  width: 160px;
+}
+
+.txns col.c-amount {
+  width: 120px;
+}
+
+.txns col.c-delete {
+  width: 72px;
+}
+
+.txns td:last-child {
+  padding-left: 4px;
+  padding-right: 8px;
+}
+
+/* The account under the merchant: only in a narrow window, where its column goes. */
+.txn-account-under {
+  display: none;
+}
+
+.txns tbody tr {
+  transition: background 0.15s;
+}
+
+.txns tbody tr:hover {
+  background: var(--row-hover);
+}
+
+.txn-date {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-300);
+  white-space: nowrap;
+}
+
+.txn-merchant {
+  font-weight: 500;
+  color: var(--ink-50);
+}
+
+.txn-desc {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-400);
+  margin-top: 1px;
+}
+
+.txn-account {
+  font-size: 12.5px;
+  color: var(--ink-300);
+}
+
+.cat-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cat-cell .select {
+  height: 30px;
+  flex: 1;
+  min-width: 0;
+  padding: 0 7px;
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-100);
+}
+
+.cat-cell .select:hover {
+  border-color: var(--ink-600);
+  background: var(--ink-900);
+}
+
+.cat-cell .select.is-empty {
+  color: var(--ink-400);
+  font-style: italic;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid var(--ink-600);
+  background: var(--ink-800);
+  color: var(--ink-100);
+  white-space: nowrap;
+  flex: none;
+}
+
+.tag.ai {
+  border-color: var(--copper-line);
+  background: var(--copper-wash);
+  color: var(--copper);
+}
+
+.tag.low {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--copper) 12%, transparent);
+  color: var(--copper-300);
+}
+
+.tag.rule {
+  border-color: color-mix(in srgb, var(--teal) 35%, transparent);
+  background: color-mix(in srgb, var(--teal) 6%, transparent);
+  color: var(--teal-400);
+}
+
+.tag.pending {
+  margin-left: 8px;
+  vertical-align: 1px;
+}
+
+/* Pending sits under the name, before the bank's text, so a long name never hides it or is cut for it. */
+.txn-name {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.txn-name .tag.pending {
+  flex-shrink: 0;
+  margin: 0 6px 0 0;
+}
+
+/* ---------- modal ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+  padding: 24px;
+}
+
+.modal {
+  background: var(--pop);
+  border: 1px solid var(--ink-600);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--copper) 8%, transparent),
+    0 24px 80px -12px var(--shadow-deep);
+  width: min(880px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 26px 28px;
+}
+
+.modal h2 {
+  margin: 4px 0 4px;
+  font-size: 24px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ink-700);
+}
+
+.mapping-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.preview-table th,
+.preview-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--ink-700);
+  text-align: left;
+}
+
+.preview-table .num {
+  text-align: right;
+}
+
+.preview-table th {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+/* ---------- toasts ---------- */
+
+.toasts {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+}
+
+.toast {
+  max-width: 440px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: var(--toast);
+  border: 1px solid var(--ink-600);
+  border-left: 2px solid var(--copper);
+  color: var(--ink-50);
+  box-shadow: 0 16px 40px -12px var(--shadow);
+  font-size: 13px;
+  animation: toast-in 0.25s ease-out;
+}
+
+.toast.error {
+  border-left-color: var(--neg);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------- misc ---------- */
+
+.empty {
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--ink-300);
+}
+
+.empty h2 {
+  font-size: 30px;
+  font-weight: 300;
+  margin: 8px 0 10px;
+}
+
+.empty p {
+  max-width: 520px;
+  margin: 0 auto 22px;
+}
+
+.steps {
+  margin: 12px 0 18px;
+  padding-left: 22px;
+  color: var(--ink-200);
+}
+
+.steps li {
+  margin: 6px 0;
+}
+
+.steps li::marker {
+  font-family: var(--font-mono);
+  color: var(--copper);
+}
+
+.progress {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ink-700);
+  overflow: hidden;
+}
+
+.progress > div {
+  height: 100%;
+  background: var(--copper);
+  transition: width 0.3s;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-500);
+  flex: none;
+}
+
+.status-dot.on {
+  background: var(--pos);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--pos) 50%, transparent);
+}
+
+.status-dot.warn {
+  background: var(--warn);
+}
+
+.status-dot.bad {
+  background: var(--neg);
+}
+
+.chart-tooltip {
+  background: var(--pop);
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px -8px var(--shadow);
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: var(--ink-100);
+  min-width: 190px;
+}
+
+.chart-tooltip .label-muted {
+  margin-bottom: 8px;
+}
+
+.chart-tooltip .row + .row {
+  margin-top: 4px;
+}
+
+.legend {
+  display: flex;
+  gap: 18px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-300);
+  margin-bottom: 12px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: inline-block;
+  flex: none;
+}
+
+.cat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cat-table td {
+  padding: 4px 4px;
+  border-top: 1px solid var(--ink-700);
+}
+
+.cat-table tr:first-child td {
+  border-top: 0;
+}
+
+.cat-table .input,
+.cat-table .select {
+  width: 100%;
+  height: 32px;
+  border-color: transparent;
+  background: transparent;
+}
+
+.cat-table .input:hover,
+.cat-table .select:hover,
+.cat-table .input:focus {
+  border-color: var(--ink-600);
+  background: var(--ink-900);
+}
+
+.data-path {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-300);
+  background: var(--ink-950);
+  border: 1px solid var(--ink-700);
+  border-radius: 2px;
+  padding: 8px 10px;
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.45s ease-out both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* The system's reduced motion: nothing slides, fades or shimmers; a busy spinner still turns, slowly. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+
+  .spin {
+    animation-duration: 2.4s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
+.skeleton {
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--ink-900) 0%, var(--ink-800) 50%, var(--ink-900) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---------- net worth ---------- */
+
+.card.networth {
+  margin-top: 16px;
+}
+
+.networth-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.networth-head h2 {
+  margin: 0;
+}
+
+.networth-head .delta {
+  margin-top: 0;
+}
+
+.networth-head .spacer {
+  flex: 1;
+}
+
+/* Net worth's Overview over a span (pages/NetWorthChart.tsx): the span picker, the net worth line and the monthly bridge. */
+.nw-time {
+  margin-top: 16px;
+}
+
+.nw-time-bar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.nw-time .card.networth {
+  margin-top: 10px;
+  padding: 14px 16px 10px 8px;
+}
+
+/* The bridge's eleven columns fit the card at 900 wide: a heading of two words may take two lines, and a name of two
+   months or two days breaks after its dash. Narrower, they scroll within their card, the month and the end kept in
+   view at either side. */
+.nw-bridge-card.card {
+  margin-top: 10px;
+  padding: 4px 0;
+  overflow-x: auto;
+}
+
+.nw-bridge {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.nw-bridge th,
+.nw-bridge td {
+  height: 28px;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--ink-800);
+  font-weight: 400;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.nw-bridge thead th {
+  height: 26px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom-color: var(--ink-700);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  vertical-align: bottom;
+  white-space: normal;
+  color: var(--ink-400);
+}
+
+.nw-bridge .name,
+.nw-bridge tr > :last-child {
+  position: sticky;
+  background: var(--card-solid);
+}
+
+/* The close marker sits at the name's right edge, so the markers make one column. */
+.nw-bridge .name {
+  left: 0;
+  padding-left: 12px;
+  padding-right: 28px;
+  box-shadow: inset -1px 0 0 var(--ink-800);
+  color: var(--ink-100);
+  text-align: left;
+}
+
+.nw-bridge tr > :last-child {
+  right: 0;
+  padding-right: 12px;
+  box-shadow: inset 1px 0 0 var(--ink-800);
+}
+
+.nw-bridge .span-mark {
+  position: absolute;
+  right: 8px;
+}
+
+/* The whole span's line, above its months. */
+.nw-bridge tr.span > * {
+  border-bottom-color: var(--ink-600);
+  color: var(--ink-50);
+  font-weight: 500;
+}
+
+/* A name breaks only where lineName lets it: after its dash. */
+.nw-bridge tbody .name {
+  white-space: normal;
+}
+
+/* A changed month's figures as its close froze them, under its line. */
+.nw-bridge tr.closed > * {
+  color: var(--ink-400);
+}
+
+.nw-bridge tr.closed .name {
+  padding-left: 26px;
+}
+
+.nw-bridge tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.segmented {
+  align-self: center;
+  display: inline-flex;
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.segmented button {
+  border: 0;
+  background: none;
+  color: var(--ink-300);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 6px 11px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.segmented button + button {
+  border-left: 1px solid var(--ink-700);
+}
+
+.segmented button:hover {
+  background: var(--ink-800);
+  color: var(--ink-50);
+}
+
+.segmented button.active {
+  background: var(--ink-800);
+  color: var(--copper);
+}
+
+.balance-input {
+  width: 140px;
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+/* An account's balance on Accounts, in a column of its own on the right (a button where it's typed by hand). */
+.acct-balance {
+  width: 140px;
+  justify-content: flex-end;
+}
+
+/* ---------- the next 30 days (pages/Upcoming.tsx) ---------- */
+
+.up-account + .up-account {
+  margin-top: 18px;
+}
+
+.up-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+
+/* ---------- connecting a bank, and the first run's Home choices ---------- */
+
+.bank-wait {
+  margin-top: 10px;
+}
+
+.wizard-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* ---------- spendable ---------- */
+
+/* The card's width says whether its three risks fit side by side. */
+.spend-card {
+  container: spend / inline-size;
+}
+
+.spend-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.spend-top h2 {
+  margin: 0;
+}
+
+.spend-top .select,
+.spend-top .input {
+  height: 30px;
+  font-size: 12.5px;
+}
+
+.spend-cushion {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spend-cushion .input {
+  width: 92px;
+}
+
+.spend-risks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--ink-700);
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.spend-risk {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 12px 16px 14px;
+  background: var(--card-2);
+  border: 0;
+  border-top: 2px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.spend-risk:hover {
+  background: var(--card-1);
+}
+
+.spend-risk.on {
+  border-top-color: var(--copper);
+  background: var(--card-1);
+}
+
+/* A focused risk's ring is drawn inside it, a pixel inside its mark: outside, the next risk's fill and the risks' clipped
+   edge covered it, on its edge it covered the chosen risk's mark, and against it, in light where the two are one
+   colour, ring and mark ran together. */
+.spend-risk:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -5px;
+}
+
+.spend-risk-value {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--ink-400);
+}
+
+.spend-risk.on .spend-risk-value {
+  color: var(--ink-50);
+}
+
+.spend-risk-value.neg,
+.spend-risk.on .spend-risk-value.neg {
+  color: var(--neg);
+}
+
+/* In a card under 500 px (a phone's, or a window just over 700 px beside the sidebar) the account and cushion go under
+   the title when they don't fit beside it, and the three risks go one under another, each its name and its figure on
+   one line, the chosen one marked at its left: side by side, a third of the card broke −$12,824 after its minus and
+   ran −$123,456 under the next risk. −$128,240 fits a third of 483 px. */
+@container spend (max-width: 499px) {
+  .spend-top {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .spend-risks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .spend-risk {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px 10px 12px;
+    border-top: 0;
+    border-left: 2px solid transparent;
+  }
+
+  .spend-risk.on {
+    border-left-color: var(--copper);
+  }
+
+  .spend-risk-value {
+    font-size: 24px;
+  }
+}
+
+/* In a contrast theme every border takes the theme's one colour, the risks' unmarked sides too: there the others' marks
+   take their fill, the chosen risk's mark is the highlight, and a focused risk's ring its text's colour. */
+@media (forced-colors: active) {
+  .spend-risk,
+  .spend-risk:hover,
+  .spend-risk.on {
+    background-color: ButtonFace;
+    border-color: ButtonFace;
+  }
+
+  .spend-risk.on {
+    border-color: Highlight;
+  }
+
+  .spend-risk:focus-visible {
+    outline-color: ButtonText;
+  }
+}
+
+/* The asterisk on Spendable's figure at a risk that can overestimate (homeView.ts spendNote): small and raised, so it
+   takes little of a risk's third of the card and leaves its line's height alone; its one line goes under the card. */
+.spend-mark {
+  position: relative;
+  top: -0.55em;
+  margin-left: 0.06em;
+  font-size: 0.55em;
+  color: var(--ink-300);
+}
+
+.spend-note {
+  margin-top: 10px;
+}
+
+.spend-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  color: var(--ink-300);
+  margin: 10px 0 14px;
+}
+
+.spend-chart {
+  position: relative;
+}
+
+.spend-chart svg rect[tabindex]:focus {
+  outline: none;
+}
+
+.spend-tick,
+.spend-day,
+.spend-value {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  fill: var(--ink-400);
+}
+
+.spend-day.weekend {
+  fill: var(--ink-500);
+}
+
+.spend-out {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--ink-300);
+}
+
+.spend-out.on {
+  fill: var(--ink-50);
+}
+
+.spend-day.on,
+.spend-value {
+  fill: var(--ink-50);
+}
+
+.spend-tip {
+  position: absolute;
+  top: 6px;
+  pointer-events: none;
+  min-width: 0;
+  max-width: 280px;
+}
+
+.spend-tip .row {
+  gap: 8px;
+}
+
+.spend-tip strong {
+  font-weight: 500;
+  color: var(--ink-50);
+}
+
+.spend-tip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.spend-tip-left {
+  border-top: 1px solid var(--ink-600);
+  padding-top: 4px;
+}
+
+/* ---------- review chat ---------- */
+
+.review-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  height: calc(100vh - var(--topbar-h));
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--ink-700);
+}
+
+.chat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+}
+
+.chat-thread {
+  max-width: 820px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-msg {
+  max-width: 88%;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.chat-msg p {
+  margin: 0;
+}
+
+.chat-msg p + p,
+.chat-msg p + ul,
+.chat-msg ul + p {
+  margin-top: 8px;
+}
+
+.chat-msg ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.chat-msg strong {
+  color: var(--ink-50);
+  font-weight: 600;
+}
+
+.chat-msg.assistant {
+  align-self: flex-start;
+  background: var(--ink-900);
+  border: 1px solid var(--ink-700);
+  color: var(--ink-100);
+}
+
+.chat-msg.user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--copper) 10%, transparent);
+  border: 1px solid var(--copper-line);
+  color: var(--ink-50);
+}
+
+.chat-action {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-300);
+}
+
+.chat-action svg {
+  color: var(--pos);
+  flex: none;
+}
+
+.chat-action.error,
+.chat-action.error svg {
+  color: var(--neg);
+}
+
+.chat-action.undone span {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.chat-action .link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.chat-action:hover .link,
+.chat-action .link:focus-visible {
+  opacity: 1;
+}
+
+.chat-msg.typing {
+  display: inline-flex;
+  gap: 5px;
+  padding: 14px 16px;
+}
+
+.chat-msg.typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-400);
+  animation: typing 1.2s infinite ease-in-out;
+}
+
+.chat-msg.typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.chat-msg.typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes typing {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.chat-composer {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  padding: 14px 32px 18px;
+  border-top: 1px solid var(--ink-700);
+  background: color-mix(in srgb, var(--ink-950) 90%, transparent);
+}
+
+.chat-composer .textarea {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  min-height: 46px;
+  max-height: 180px;
+}
+
+.chat-composer .btn {
+  height: 46px;
+  width: 46px;
+}
+
+.chat-composer-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-composer-body .textarea {
+  width: 100%;
+}
+
+.chat-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.chat-attachments .vendor-chip {
+  font-size: 12.5px;
+}
+
+.chat-attachments .vendor-chip .btn {
+  height: 26px;
+  width: 26px;
+}
+
+.review-side {
+  overflow-y: auto;
+  padding: 24px 22px;
+}
+
+.review-side .list-row {
+  padding: 8px 0;
+}
+
+.review-side .fact .btn {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.review-side .fact:hover .btn {
+  opacity: 1;
+}
+
+/* ---------- assets ---------- */
+
+.neg {
+  color: var(--neg);
+}
+
+.field .textarea {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.stat-strip.even {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stat-strip.five {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.stat-strip.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stat-strip.five .tile-value {
+  font-size: 28px;
+}
+
+.asset-group {
+  margin-top: 30px;
+}
+
+.asset-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--ink-700);
+}
+
+.asset-group-head h2 {
+  margin: 0;
+  font-size: 21px;
+}
+
+.asset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.asset-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding: 18px 20px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.asset-card:hover {
+  border-color: var(--copper-line);
+  background: var(--copper-wash);
+}
+
+.asset-card:focus-visible {
+  outline: 1px solid var(--copper);
+  outline-offset: 2px;
+}
+
+.asset-card.sold .asset-value {
+  color: var(--ink-300);
+}
+
+.asset-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.asset-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 14.5px;
+}
+
+.asset-value {
+  margin: 12px 0 14px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-50);
+}
+
+.asset-figs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ink-700);
+}
+
+.asset-figs .num {
+  text-align: left;
+  margin-top: 4px;
+  font-size: 12.5px;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.point-list {
+  max-height: 280px;
+  overflow: auto;
+}
+
+.loan-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ink-700);
+}
+
+.modal.narrow {
+  width: min(560px, 100%);
+}
+
+.acct-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 22px 0 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ink-600);
+}
+
+.acct-group-head:first-of-type {
+  margin-top: 8px;
+}
+
+.acct-group-head .num {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+.acct-history {
+  padding: 4px 0 16px 18px;
+  border-left: 1px solid var(--copper-line);
+  margin: 0 0 8px 4px;
+}
+
+.acct-history .card {
+  background: none;
+  border: 0;
+  padding: 8px 0 0;
+  box-shadow: none;
+}
+
+@media (max-width: 1100px) {
+  .stat-strip.five {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.asset-table {
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.asset-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) repeat(5, minmax(90px, 1fr));
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 12px 18px;
+  background: var(--well);
+  border: 0;
+  border-top: 1px solid var(--ink-700);
+  font: inherit;
+  font-size: 13.5px;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.asset-row:first-child {
+  border-top: 0;
+}
+
+.asset-row.head {
+  cursor: default;
+  background: var(--ink-900);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+.asset-row:not(.head):hover {
+  background: var(--copper-wash);
+}
+
+.asset-row.sold .num:nth-child(2) {
+  color: var(--ink-300);
+}
+
+.valuation {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ink-700);
+}
+
+.valuation p {
+  margin: 8px 0 10px;
+  color: var(--ink-200);
+  line-height: 1.5;
+}
+
+/* ---------- taxes ---------- */
+
+.asset-row.tax-row {
+  grid-template-columns: 96px repeat(6, minmax(80px, 1fr)) minmax(0, 1.2fr);
+}
+
+/* The preparer's name is text after a right-aligned amount; a little more room keeps them apart. */
+.asset-row.tax-row > :last-child {
+  padding-left: 14px;
+}
+
+.asset-row.tax-row.open {
+  background: var(--copper-wash);
+}
+
+.tax-year {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+}
+
+.tax-flag {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--copper);
+}
+
+.tax-check-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(4, minmax(80px, 1fr)) 60px minmax(110px, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid var(--ink-700);
+  background: var(--well);
+  font-size: 13.5px;
+}
+
+.tax-check-row:first-child {
+  border-top: 0;
+}
+
+.tax-check-row.head {
+  background: var(--ink-900);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+.tax-check-row.total {
+  background: var(--ink-900);
+  color: var(--ink-50);
+}
+
+.tax-detail {
+  padding: 16px 18px 20px;
+  border-top: 1px solid var(--ink-700);
+  background: var(--ink-900);
+}
+
+.tax-detail-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.tax-detail .label-muted {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.tax-sub {
+  margin-top: 16px;
+}
+
+.tax-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--ink-800);
+  font-size: 13px;
+  color: var(--ink-200);
+}
+
+.tax-kv.strong {
+  color: var(--ink-50);
+}
+
+.tax-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--ink-100);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tax-form:hover:not(:disabled) {
+  color: var(--copper);
+}
+
+.tax-form.gone {
+  color: var(--ink-400);
+  cursor: default;
+}
+
+.tax-issues {
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  list-style: none;
+  border-left: 2px solid var(--copper);
+  background: var(--copper-wash);
+  font-size: 13px;
+  color: var(--ink-100);
+}
+
+.tax-issues li + li {
+  margin-top: 6px;
+}
+
+.tax-hero {
+  padding: 22px 18px 20px;
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+}
+
+.tax-hero-top {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.tax-hero-value {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 54px;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: var(--ink-50);
+}
+
+.tax-hero-unit {
+  margin-left: 12px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  letter-spacing: 0;
+  color: var(--ink-300);
+}
+
+.tax-hero-sub {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-400);
+}
+
+.tax-hero-side {
+  min-width: 190px;
+  padding-left: 22px;
+  border-left: 1px solid var(--ink-700);
+}
+
+.tax-hero-side-value {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 28px;
+  line-height: 1.05;
+  color: var(--ink-50);
+}
+
+/* Money back to you is teal and money owed is copper, the chart colors' text weights. */
+.tax-back,
+.tax-kv.tax-back .num {
+  color: var(--teal-400);
+}
+
+.tax-owed,
+.tax-kv.tax-owed .num {
+  color: var(--copper);
+}
+
+.pay-bar-wrap {
+  margin-top: 24px;
+}
+
+.pay-bar {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+}
+
+.pay-seg {
+  min-width: 2px;
+}
+
+.pay-seg.light,
+.pay-swatch.light {
+  opacity: 0.42;
+}
+
+/* Room left under a limit: an empty stretch of the bar. */
+.pay-seg.track,
+.pay-swatch.track {
+  background: var(--ink-700);
+}
+
+.refund-chart.hsa-years {
+  margin-top: 22px;
+}
+
+/* A recorded year's source can be long: let it wrap. */
+.hsa-years .refund-tip {
+  max-width: 300px;
+  white-space: normal;
+}
+
+.pay-seg:first-child {
+  border-radius: 1px 0 0 1px;
+}
+
+.pay-seg:last-child {
+  border-radius: 0 1px 1px 0;
+}
+
+.pay-seg:only-child {
+  border-radius: 1px;
+}
+
+.pay-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin-top: 14px;
+}
+
+.returns-legend {
+  margin: 0 0 0 auto;
+  gap: 18px;
+}
+
+.pay-key {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ink-200);
+}
+
+.pay-swatch {
+  align-self: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.pay-key-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-50);
+}
+
+.refund-chart {
+  position: relative;
+  margin: 4px 0 18px;
+}
+
+.refund-chart svg rect[role='button']:focus {
+  outline: none;
+}
+
+.refund-value {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  fill: var(--ink-200);
+}
+
+.refund-tick,
+.refund-year {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  fill: var(--ink-400);
+}
+
+.refund-tick {
+  fill: var(--ink-400);
+}
+
+.refund-year.on {
+  fill: var(--ink-50);
+}
+
+.refund-tip {
+  position: absolute;
+  top: 6px;
+  pointer-events: none;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.refund-tip .row {
+  gap: 8px;
+}
+
+.refund-tip strong {
+  font-weight: 500;
+  color: var(--ink-50);
+}
+
+/* ---------- credit and insurance ---------- */
+
+.credit-score-row,
+.credit-card-row,
+.credit-inquiry-row,
+.insurance-work-row {
+  display: grid;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid var(--ink-700);
+  background: var(--well);
+  font-size: 13.5px;
+}
+
+.credit-score-row:first-child,
+.credit-card-row:first-child,
+.credit-inquiry-row:first-child,
+.insurance-work-row:first-child {
+  border-top: 0;
+}
+
+.credit-score-row.head,
+.credit-card-row.head,
+.credit-inquiry-row.head,
+.insurance-work-row.head,
+.credit-trade-row.head {
+  background: var(--ink-900);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+.credit-score-row {
+  grid-template-columns: 130px 80px 80px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr) 28px;
+}
+
+.credit-card-row {
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(80px, 1fr)) minmax(0, 1.4fr);
+}
+
+.credit-inquiry-row {
+  grid-template-columns: minmax(0, 2fr) 130px minmax(0, 1fr) 130px;
+}
+
+.insurance-work-row {
+  grid-template-columns: minmax(0, 2fr) 100px minmax(0, 1.2fr) repeat(3, minmax(80px, 1fr));
+}
+
+.asset-row.credit-report-row {
+  grid-template-columns: 140px 130px repeat(4, minmax(70px, 1fr));
+}
+
+.asset-row.insurance-row {
+  grid-template-columns: minmax(0, 2.2fr) 100px repeat(4, minmax(80px, 1fr)) 160px;
+}
+
+.asset-row.credit-report-row.open,
+.asset-row.insurance-row.open {
+  background: var(--copper-wash);
+}
+
+.asset-row.insurance-row.ended {
+  color: var(--ink-300);
+}
+
+/* A text column right after a column of numbers. */
+.credit-score-row > :nth-child(4),
+.credit-card-row > :last-child,
+.credit-trade-row > :last-child,
+.asset-row.insurance-row > :last-child {
+  padding-left: 16px;
+}
+
+.tile-sub.truncate {
+  display: block;
+}
+
+.credit-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  vertical-align: 1px;
+}
+
+.credit-meter {
+  margin-bottom: 18px;
+}
+
+.credit-meter .pay-bar-wrap {
+  margin-top: 0;
+}
+
+.credit-note {
+  margin-bottom: 12px;
+}
+
+.credit-trade-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) 90px 170px minmax(0, 1.3fr) 90px 90px minmax(0, 1.3fr);
+  gap: 12px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--ink-800);
+  font-size: 13px;
+  color: var(--ink-100);
+}
+
+.credit-trade-row.head {
+  background: none;
+}
+
+.credit-trade-row.closed {
+  color: var(--ink-400);
+}
+
+.credit-file {
+  margin-top: 12px;
+}
+
+.insurance-covers {
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--ink-200);
+}
+
+/* ---------- goals ---------- */
+
+.asset-row.goal-row {
+  grid-template-columns: minmax(130px, 2fr) minmax(90px, 1.3fr) repeat(2, minmax(70px, 1fr)) 110px minmax(70px, 1fr) 84px;
+}
+
+.asset-row.goal-row.open {
+  background: var(--copper-wash);
+}
+
+.asset-row.goal-row.archived {
+  color: var(--ink-300);
+}
+
+/* The text columns after the numbers. */
+.asset-row.goal-row > :nth-child(5),
+.asset-row.goal-row > :nth-child(7) {
+  padding-left: 16px;
+}
+
+.goal-detail-cols {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+}
+
+.goal-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.goal-progress .goal-bar {
+  flex: 1;
+}
+
+.goal-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink-700);
+  overflow: hidden;
+}
+
+.goal-bar > div {
+  height: 100%;
+  background: var(--chart-teal);
+}
+
+.goal-bar.behind > div,
+.goal-bar.past_due > div {
+  background: var(--chart-copper);
+}
+
+.tag.goal-on_track,
+.tag.goal-done {
+  border-color: color-mix(in srgb, var(--teal) 35%, transparent);
+  background: color-mix(in srgb, var(--teal) 6%, transparent);
+  color: var(--teal-400);
+}
+
+.tag.goal-behind {
+  border-color: var(--copper-line);
+  background: var(--copper-wash);
+  color: var(--copper);
+}
+
+.tag.goal-past_due {
+  border-color: var(--neg);
+  color: var(--neg);
+}
+
+.tax-kv.goal-log {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr) auto 24px;
+  align-items: center;
+}
+
+.goal-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.goal-add .input[type='date'] {
+  width: 140px;
+}
+
+.goal-add .input.num {
+  width: 100px;
+}
+
+.goal-add .input:not(.num):not([type='date']) {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.goal-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.goal-accounts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.goal-accounts .check {
+  display: flex;
+}
+
+.goal-accounts .grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.goal-from {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ink-700);
+}
+
+/* ---------- calendar ---------- */
+
+.cal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+.cal-side > .card + .card {
+  margin-top: 16px;
+}
+
+.cal-card {
+  padding: 14px;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--ink-700);
+  border: 1px solid var(--ink-700);
+}
+
+.cal-weekday {
+  background: var(--ink-900);
+  padding: 8px 10px;
+}
+
+.cal-cell {
+  background: color-mix(in srgb, var(--ink-950) 94%, transparent);
+  min-height: 112px;
+  padding: 6px 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.cal-cell:hover {
+  background: color-mix(in srgb, var(--ink-950) 50%, var(--ink-900));
+}
+
+.cal-cell.out {
+  background: var(--well);
+}
+
+.cal-cell.out .cal-daynum {
+  color: var(--ink-400);
+}
+
+.cal-daynum {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-300);
+  padding: 2px 4px 4px;
+  pointer-events: none;
+}
+
+.cal-cell.today .cal-daynum {
+  color: var(--on-copper);
+  background: var(--copper);
+  border-radius: 2px;
+  align-self: flex-start;
+}
+
+.cal-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  width: 100%;
+  padding: 2px 6px;
+  border: 0;
+  border-left: 2px solid var(--ink-500);
+  border-radius: 2px;
+  background: var(--ink-800);
+  color: var(--ink-100);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  cursor: default;
+}
+
+.cal-chip .truncate {
+  flex: 1;
+  min-width: 0;
+}
+
+.cal-amt,
+.cal-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-300);
+}
+
+.cal-time {
+  flex: none;
+}
+
+.cal-done {
+  text-decoration: line-through;
+  color: var(--ink-400);
+}
+
+.cal-chip.reminder {
+  border-left-color: var(--copper);
+  background: var(--copper-wash);
+  cursor: pointer;
+}
+
+.cal-chip.income {
+  border-left-color: var(--pos);
+}
+
+.cal-chip.income .cal-amt {
+  color: var(--pos);
+}
+
+.cal-chip.bill {
+  border-left-color: var(--neg);
+}
+
+.cal-chip.transfer {
+  border-left-color: var(--ink-400);
+  color: var(--ink-300);
+}
+
+.cal-more {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-400);
+  padding-left: 6px;
+}
+
+.cal-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--ink-400);
+}
+
+.cal-dot.reminder {
+  background: var(--copper);
+}
+
+.cal-dot.income {
+  background: var(--pos);
+}
+
+.cal-dot.bill {
+  background: var(--neg);
+}
+
+@media (max-width: 1180px) {
+  .cal-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- buckets ---------- */
+
+.chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-self: center;
+}
+
+.chip {
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius);
+  background: none;
+  color: var(--ink-400);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.chip:hover {
+  color: var(--ink-50);
+  background: var(--ink-800);
+}
+
+.chip.active {
+  color: var(--copper);
+  border-color: var(--copper-line);
+  background: var(--copper-wash);
+}
+
+.bucket-table .asset-row {
+  grid-template-columns: minmax(0, 2.2fr) minmax(150px, 1.3fr) repeat(5, minmax(90px, 1fr));
+}
+
+/* A venture's row on Net worth: its name, then its share, under the name when the column is narrow; a name longer
+   than the column is cut. */
+.sheet-venture {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.sheet-venture > .truncate {
+  min-width: 0;
+}
+
+.sheet-venture > .muted {
+  flex: none;
+  white-space: pre;
+}
+
+/* A venture's name, then its kind and share: they go under the name when the column is narrow. */
+.bucket-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-width: 0;
+}
+
+.bucket-name > .truncate {
+  min-width: 0;
+  max-width: 100%;
+  margin-right: 2px;
+}
+
+.bucket-desc {
+  margin: 0 0 16px;
+  white-space: pre-line;
+}
+
+.money-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(3, minmax(62px, 88px));
+  gap: 8px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-top: 1px solid var(--ink-700);
+  font-size: 13px;
+}
+
+.money-row.head {
+  border-top: 0;
+  padding-top: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+.money-row.total {
+  border-top-color: var(--ink-500);
+  font-weight: 600;
+}
+
+.money-row.pair {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.money-table > .money-row.pair:first-child {
+  border-top: 0;
+}
+
+.money-row.pair.head {
+  padding-top: 16px;
+}
+
+/* A venture's assets: name, bought, sold, cost, value, selling costs, gain. */
+.money-row.venture-asset {
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(84px, 0.9fr)) repeat(4, minmax(72px, 1fr));
+  align-items: center;
+}
+
+/* Personal's use of a venture's places: place, dates, Personal's share, Personal's part of the costs. */
+.money-row.personal-use {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.6fr) minmax(52px, 0.4fr) minmax(72px, 0.7fr);
+  align-items: center;
+}
+
+/* The money between Personal and a venture: its figures on a line that wraps, its shares, the owner money (kind, in,
+   out, outstanding, interest) and the boundary lines (day, account, amount, parts), the parts under the rest when
+   the card is narrow. */
+.card.venture-owner {
+  margin-bottom: 16px;
+}
+
+.owner-figures,
+.owner-shares {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 22px;
+}
+
+.owner-shares {
+  gap: 4px 16px;
+  margin-top: 10px;
+}
+
+.owner-figure {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.owner-figures .owner-figure .num {
+  font-size: 15px;
+}
+
+.owner-table {
+  margin-top: 14px;
+}
+
+.money-row.owner-money {
+  grid-template-columns: minmax(0, 1.3fr) repeat(4, minmax(64px, 1fr));
+}
+
+.owner-lines {
+  margin-top: 6px;
+}
+
+.money-row.owner-line {
+  grid-template-columns: 92px minmax(0, 1fr) minmax(84px, auto) minmax(0, 1.8fr);
+  align-items: baseline;
+}
+
+.money-row.link-row {
+  width: 100%;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.money-row.link-row:hover {
+  background: var(--copper-wash);
+}
+
+.owner-parts {
+  color: var(--ink-300);
+}
+
+@media (max-width: 700px) {
+  .money-row.owner-line {
+    grid-template-columns: 76px minmax(0, 1fr) auto;
+  }
+
+  .money-row.owner-line .owner-parts {
+    grid-column: 2 / -1;
+  }
+
+  /* The owner money's kind over its four figures. */
+  .money-row.owner-money {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2px 6px;
+  }
+
+  .money-row.owner-money > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* An asset's carrying cost by owner: the owners' names wrap rather than run into the next column. */
+.money-row.carry-head > span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* An asset's uses: the days, the owners' shares, the basis; the shares wrap under the days when space runs out. */
+.list-row.use-row {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+.venture-gain-kind {
+  display: block;
+  margin-top: 2px;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+}
+
+.cat-cell .select.is-personal {
+  color: var(--ink-400);
+}
+
+/* ---------- contributions ---------- */
+
+.contrib {
+  margin-top: 16px;
+}
+
+.contrib-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr) repeat(3, minmax(96px, 0.8fr));
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--ink-700);
+  font-size: 13.5px;
+}
+
+.contrib-row > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.contrib-row .num {
+  align-items: flex-end;
+}
+
+/* A note under a number wraps in its own column instead of spilling over the one beside it. */
+.contrib-row .num .txn-desc {
+  max-width: 100%;
+  text-align: right;
+  white-space: normal;
+}
+
+.contrib-row.head {
+  border-top: 0;
+  padding-top: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+.contrib-row.ended {
+  color: var(--ink-300);
+}
+
+.contrib-limit {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ink-600);
+}
+
+.contrib-bar {
+  display: flex;
+  height: 6px;
+  margin-top: 8px;
+  background: var(--ink-800);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.contrib-bar .so-far {
+  background: var(--chart-teal);
+}
+
+.contrib-bar .planned {
+  background: var(--teal-400);
+  opacity: 0.45;
+}
+
+.contrib-bar .over {
+  background: var(--neg);
+}
+
+/* ---------- investments ---------- */
+
+.invest-row {
+  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.1fr) repeat(5, minmax(84px, 1fr));
+}
+
+.invest-row .chev {
+  display: inline-block;
+  width: 14px;
+  color: var(--ink-400);
+  transition: transform 0.12s;
+}
+
+.invest-row.open .chev {
+  transform: rotate(90deg);
+}
+
+.holding-row {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 2fr) repeat(8, minmax(72px, 1fr));
+  gap: 12px;
+  align-items: center;
+  padding: 9px 18px 9px 44px;
+  border-top: 1px solid var(--ink-800);
+  background: var(--ink-950);
+  font-size: 12.5px;
+}
+
+.holding-row.head {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-400);
+}
+
+.holding-row.all {
+  padding-left: 18px;
+  grid-template-columns: 90px minmax(0, 2.2fr) repeat(7, minmax(80px, 1fr));
+}
+
+.returns-row {
+  display: grid;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid var(--ink-800);
+  background: var(--well);
+  font-size: 13px;
+}
+
+.returns-row:first-child {
+  border-top: 0;
+}
+
+.returns-row.head {
+  background: var(--ink-900);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-400);
+}
+
+.returns-row.total {
+  font-weight: 500;
+  color: var(--ink-50);
+}
+
+.returns-row.member {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  background: var(--ink-950);
+  font-size: 12.5px;
+  color: var(--ink-200);
+}
+
+.returns-row.member > :first-child {
+  padding-left: 16px;
+}
+
+.yr {
+  margin-left: 2px;
+  font-size: 0.8em;
+  color: var(--ink-400);
+}
+
+.holding-row .sym {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--copper);
+}
+
+.treat-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 8px;
+  vertical-align: 1px;
+}
+
+.est {
+  font-style: italic;
+}
+
+/* ---------- debt plan (Net worth > Debts) ---------- */
+
+/* Opened at the plan, its heading sits below the sticky top bar. */
+#payoff {
+  scroll-margin-top: calc(var(--topbar-h) + 8px);
+  container: payoff / inline-size;
+}
+
+/* The heading keeps to one line: the order and the next debt give way, cut short, to a long name. */
+.plan-head h2 {
+  flex: none;
+  white-space: nowrap;
+}
+
+.plan-head > .label-muted {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-strip {
+  margin-bottom: 14px;
+}
+
+/* The plan's figures: four in pairs under 1000 px (the strip rule there leaves the plan's alone), and one above the
+   other at a phone's width, three or four. */
+@media (max-width: 1000px) {
+  .stat-strip.plan-strip.even {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .stat-strip.plan-strip.even,
+  .stat-strip.plan-strip.three {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.plan-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.plan-input .label-muted {
+  margin-right: 4px;
+}
+
+/* An input's figures wrap rather than run past the page: several debts left out, each with its minimum, above all. */
+.plan-input .num {
+  white-space: normal;
+}
+
+.plan-chart {
+  margin-top: 16px;
+}
+
+/* Narrower than this the balances have no room to read beside their axis; the figures and the table carry them. */
+@container payoff (max-width: 320px) {
+  .plan-chart {
+    display: none;
+  }
+}
+
+/* The plan's table keeps each debt's name and what it owes; narrower, it gives up the columns it can spare. */
+.plan-table {
+  container-type: inline-size;
+  margin-top: 16px;
+}
+
+.debt-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(64px, 0.8fr) minmax(100px, 1.1fr) minmax(52px, 0.7fr) minmax(20px, 0.3fr) minmax(72px, 0.8fr) minmax(60px, 0.8fr);
+  gap: 10px;
+  align-items: center;
+  padding: 10px 16px;
+  border-top: 1px solid var(--ink-700);
+  background: var(--well);
+  font-size: 13.5px;
+}
+
+/* A debt's name on up to two lines, the whole of it in its title, so a long one doesn't make its row four deep. */
+.debt-row .debt-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.debt-row:first-child {
+  border-top: 0;
+}
+
+.debt-row.head {
+  background: var(--ink-900);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+/* A debt left out, dimmed to the muted ink, which still reads on the well (scripts/contrast.ts). */
+.debt-row.off,
+.debt-row.off .muted {
+  color: var(--ink-400);
+}
+
+@container (max-width: 640px) {
+  .debt-row {
+    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(58px, 1fr));
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .debt-row > :nth-child(4),
+  .debt-row > :nth-child(5),
+  .debt-row > :nth-child(7) {
+    display: none;
+  }
+}
+
+/* A phone's width: each debt's name on its own line, what it owes and when it's paid off under it. */
+@container (max-width: 360px) {
+  .debt-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    font-size: 12.5px;
+  }
+
+  .debt-row > :first-child {
+    flex-basis: 100%;
+  }
+
+  .debt-row > :nth-child(3) {
+    display: none;
+  }
+}
+
+/* ---------- benefits ---------- */
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 12px;
+}
+
+.plan-grid > .card + .card {
+  margin-top: 0;
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.plan-card h2 {
+  margin: 6px 0 4px;
+}
+
+.plan-terms {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-100);
+}
+
+.plan-terms > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.plan-terms > div > span:first-child {
+  color: var(--ink-400);
+}
+
+.plan-terms .mono {
+  font-size: 12.5px;
+}
+
+.plan-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: auto;
+}
+
+.plan-foot .btn svg {
+  margin-right: 2px;
+}
+
+.stages {
+  display: grid;
+  gap: 8px;
+}
+
+.stage-bar {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  height: 8px;
+}
+
+.stage {
+  display: block;
+  height: 100%;
+  border-radius: 1px;
+}
+
+.stage.s1 {
+  background: var(--chart-copper);
+}
+
+.stage.s2 {
+  background: var(--chart-slate);
+}
+
+.stage.s3 {
+  background: var(--chart-teal);
+}
+
+.stage-marker {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 16px;
+  margin-left: -1px;
+  background: var(--ink-50);
+}
+
+.stage-labels {
+  display: flex;
+  gap: 2px;
+}
+
+.stage-labels span {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.stage-labels b {
+  font-weight: 500;
+}
+
+.stage-labels small {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-400);
+}
+
+.cost-table {
+  border-top: 1px solid var(--ink-700);
+}
+
+.cost-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--ink-700);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cost-row.oon {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 0.9fr);
+}
+
+.free-row,
+.care-row,
+.other-row {
+  display: grid;
+  gap: 12px;
+  align-items: center;
+  padding: 9px 18px;
+  border-top: 1px solid var(--ink-700);
+  background: var(--well);
+  font-size: 13.5px;
+}
+
+.free-row {
+  grid-template-columns: minmax(0, 1.6fr) 90px minmax(0, 1fr) 110px 90px 110px;
+}
+
+.care-row {
+  grid-template-columns: 18px 96px minmax(0, 1.7fr) 72px minmax(0, 1fr) 88px minmax(0, 1.3fr) 140px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.care-row input[type='checkbox'] {
+  margin: 0;
+  accent-color: var(--copper);
+}
+
+.care-row.picked {
+  background: var(--copper-wash);
+}
+
+.care-row.drop {
+  background: var(--copper-wash);
+  box-shadow: inset 0 0 0 1px var(--copper-line);
+}
+
+.receipt-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.receipt-link,
+.receipt-add,
+.receipt-x {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--ink-100);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.receipt-link:hover,
+.receipt-add:hover {
+  color: var(--copper);
+}
+
+.receipt-link.gone {
+  color: var(--neg);
+}
+
+.receipt-add {
+  gap: 4px;
+  color: var(--ink-400);
+}
+
+.receipt-x {
+  flex: none;
+  padding: 2px;
+  color: var(--ink-400);
+  opacity: 0;
+}
+
+.care-row:hover .receipt-x {
+  opacity: 1;
+}
+
+.receipt-x:hover {
+  color: var(--neg);
+}
+
+.select-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.select-bar .btn svg {
+  margin-right: 2px;
+}
+
+.other-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) 130px 140px;
+}
+
+.free-row:first-child,
+.care-row:first-child,
+.other-row:first-child {
+  border-top: 0;
+}
+
+.cost-row.head,
+.free-row.head,
+.care-row.head,
+.other-row.head {
+  background: var(--ink-900);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+.cost-row.head {
+  background: none;
+}
+
+.care-row.dim > .fade {
+  opacity: 0.5;
+}
+
+.care-row .select {
+  height: 28px;
+  width: 100%;
+  padding: 0 6px;
+  font-size: 12.5px;
+}
+
+.care-more {
+  display: block;
+  width: 100%;
+  padding: 9px 18px;
+  border: 0;
+  border-top: 1px solid var(--ink-700);
+  background: var(--ink-900);
+  color: var(--ink-300);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.care-more:hover {
+  color: var(--ink-50);
+}
+
+.tag.due {
+  border-color: var(--copper-line);
+  color: var(--copper);
+}
+
+/* ---------- net worth ---------- */
+
+.comp {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.comp-line {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 96px;
+  gap: 14px;
+  align-items: center;
+}
+
+.comp-track {
+  height: 14px;
+}
+
+.comp-bar {
+  display: flex;
+  gap: 2px;
+  height: 100%;
+  min-width: 2px;
+}
+
+.comp-bar span {
+  display: block;
+  height: 100%;
+  min-width: 3px;
+  border-radius: 1px;
+}
+
+.comp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  padding-top: 4px;
+  font-size: 12.5px;
+  color: var(--ink-300);
+}
+
+.comp-legend .num {
+  color: var(--ink-100);
+  margin-left: 4px;
+}
+
+.sheet-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+  margin-top: 26px;
+}
+
+.sheet-col-head {
+  margin-bottom: 10px;
+}
+
+.sheet-row.sheet-legend,
+.sheet-row.sheet-legend:hover {
+  border: 0;
+  background: none;
+  cursor: default;
+  padding-top: 0;
+  padding-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+
+.sheet-group {
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.sheet-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px 116px;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 8px 16px;
+  border: 0;
+  border-top: 1px solid var(--ink-700);
+  background: var(--well);
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sheet-row:hover {
+  background: var(--copper-wash);
+}
+
+.sheet-head {
+  border-top: 0;
+  background: var(--ink-900);
+  font-size: 14px;
+  font-weight: 500;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+.sheet-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sheet-name svg {
+  margin-left: 4px;
+  color: var(--ink-400);
+}
+
+.sheet-more {
+  cursor: default;
+  font-size: 12px;
+}
+
+.sheet-more:hover {
+  background: var(--well);
+}
+
+.debtlist-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) 110px 90px 70px minmax(0, 1.3fr) 96px minmax(0, 1.2fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid var(--ink-700);
+  background: var(--well);
+  font-size: 13.5px;
+}
+
+.debtlist-row:first-child {
+  border-top: 0;
+}
+
+.debtlist-row.head {
+  background: var(--ink-900);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+}
+
+/* A page's own nav right after its title (the Net worth views), so it never moves. */
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  margin-left: 18px;
+}
+
+.asset-card.static {
+  cursor: default;
+}
+
+.asset-card.static:hover {
+  border-color: var(--ink-700);
+  background: var(--card-bg);
+}
+
+.card-footer {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-300);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- privacy ---------- */
+
+/* Digits, commas and periods only: with numbers hidden, any number draws as the same "•••" whatever its
+   length (the font joins a run of digits into one), and words stay readable. */
+@font-face {
+  font-family: 'Hidden Digits';
+  src: url('./assets/hidden-digits.ttf') format('truetype');
+  unicode-range: U+002C, U+002E, U+0030-0039;
+  font-display: block;
+}
+
+html.numbers-hidden {
+  --font-display: 'Hidden Digits', 'Source Serif 4 Variable', Georgia, serif;
+  --font-sans: 'Hidden Digits', 'Inter Variable', system-ui, 'Segoe UI', sans-serif;
+  --font-mono: 'Hidden Digits', 'JetBrains Mono Variable', ui-monospace, Consolas, monospace;
+}
+
+/* Chart labels that name their own font. */
+html.numbers-hidden svg [font-family] {
+  font-family: var(--font-mono);
+}
+
+.brand-eye {
+  margin-left: auto;
+  color: var(--ink-400);
+  -webkit-app-region: no-drag;
+}
+
+.vendor-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--ink-100);
+}
+
+.vendor-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding-left: 10px;
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius);
+}
+
+.vendor-list .input {
+  width: 180px;
+  height: 30px;
+}
+
+/* ---------- empty states, sample data, dropped files ---------- */
+
+.empty-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.empty .muted + .empty-actions,
+.empty h2 + .empty-actions {
+  margin-top: 18px;
+}
+
+.empty > .btn + .btn {
+  margin-left: 8px;
+}
+
+/* Inside a card or a side panel: the same look, less air. */
+.empty.compact {
+  padding: 22px 16px;
+}
+
+.sample-bar {
+  margin: 0 0 18px;
+}
+
+.drop-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--ink-950) 72%, transparent);
+  backdrop-filter: blur(3px);
+  box-shadow: inset 0 0 0 2px var(--copper-line);
+}
+
+.drop-veil span {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 300;
+  color: var(--copper);
+  padding: 18px 36px;
+  border: 1px dashed var(--copper-line);
+  border-radius: var(--radius);
+}
+
+/* ---------- first run ---------- */
+
+.wizard {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 56px 24px 24px;
+  overflow-y: auto;
+  background-color: var(--ink-950);
+  background-image:
+    radial-gradient(1200px 600px at 85% -10%, color-mix(in srgb, var(--copper) 7%, transparent), transparent 60%),
+    radial-gradient(900px 500px at 0% 100%, color-mix(in srgb, var(--teal) 5%, transparent), transparent 50%);
+}
+
+/* The window's top edge stays its drag handle, under the native caption buttons. */
+.wizard-drag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  -webkit-app-region: drag;
+}
+
+.wizard-panel {
+  width: min(680px, 100%);
+  padding: 30px 34px 26px;
+  background: var(--panel-bg);
+  border: 1px solid var(--ink-700);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--copper) 8%, transparent),
+    0 24px 80px -12px var(--shadow-deep);
+  outline: none;
+}
+
+.wizard-count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 18px;
+}
+
+.wizard-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 6px;
+}
+
+.wizard-brand svg {
+  width: 30px;
+  height: 30px;
+  color: var(--copper);
+  flex: none;
+}
+
+.wizard-name,
+.wizard-panel h2 {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--ink-50);
+  margin: 0;
+}
+
+.wizard-line {
+  color: var(--ink-300);
+  margin: 8px 0 26px;
+}
+
+.wizard-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wizard-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--ink-900) 60%, transparent);
+}
+
+.wizard-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  width: 132px;
+  flex: none;
+}
+
+.wizard-code-label {
+  width: auto;
+  margin-top: 22px;
+}
+
+.wizard-row code {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-200);
+}
+
+.wizard-caps {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-300);
+  margin-top: 14px;
+}
+
+/* Spendable right after a bank links: the number, big. */
+.wizard-figure {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 64px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink-50);
+  margin-top: 22px;
+}
+
+.wizard-figure.neg {
+  color: var(--neg);
+}
+
+.wizard-figure-sub {
+  margin: 8px 0 22px;
+}
+
+.wizard-keyrow {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.wizard-keyrow .input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* A check's one-line result: the key's, or the bank token's. */
+.wizard-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-200);
+}
+
+.wizard-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ink-700);
+}
+
+.wizard-actions .spacer {
+  flex: 1;
+}
+
+/* Later sits on the left of the primary when there is nothing else in the row. */
+.wizard-actions > .btn:first-child:not(:only-child):not(.ghost) + .spacer {
+  flex: 1;
+}
+
+.wizard-actions > .btn.ghost:first-child {
+  margin-left: auto;
+}
+
+/* ---------- the recovery code (RecoveryCode.tsx) ---------- */
+
+.recovery {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.recovery-code {
+  font-family: var(--font-mono);
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  color: var(--ink-50);
+  padding: 14px 16px;
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius);
+  background: var(--ink-950);
+  user-select: all;
+  overflow-wrap: anywhere;
+}
+
+.recovery-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recovery-actions .check {
+  margin-left: auto;
+}
+
+.recovery-modal {
+  width: min(560px, 100%);
+}
+
+.recovery-file {
+  margin: 6px 0 2px;
+  overflow-wrap: anywhere;
+}
+
+.recovery-field {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.recovery-input {
+  flex: 1;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.recovery-error {
+  min-height: 18px;
+  margin-top: 8px;
+}
+
+/* index.html#unlock: the one window before the database opens. */
+.unlock {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 34px 32px;
+}
+
+.unlock h2 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 300;
+  margin: 0;
+  color: var(--ink-50);
+}
+
+/* ---------- plans and locks ---------- */
+
+/* A locked sidebar entry carries the glyph at its right edge, before any chevron. */
+.nav-lock {
+  margin-left: auto;
+  color: var(--ink-500);
+  flex: none;
+}
+
+.nav-badge + .nav-lock,
+.nav-lock + .nav-chevron {
+  margin-left: 6px;
+}
+
+.tier-lock h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  margin: 10px 0 4px;
+  color: var(--ink-100);
+}
+
+.tier-lock.compact h2 {
+  font-size: 17px;
+  margin: 6px 0 2px;
+}
+
+.tier-lock .eyebrow + h2 + .empty-actions {
+  margin-top: 16px;
+}
+
+.tier-name {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--ink-50);
+}
+
+.tier-rows {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 20px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.tier-rows code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-200);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tier-rows .input {
+  max-width: 420px;
+}
+
+/* ---------- Claude Desktop's connector (Settings → Claude Desktop) ---------- */
+
+.connector-file {
+  color: var(--ink-200);
+  overflow-wrap: anywhere;
+}
+
+.connector-changes td:first-child {
+  color: var(--ink-300);
+  overflow-wrap: anywhere;
+}
+
+.connector-changes td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* ---------- What's sent and the request log (Settings → AI) ---------- */
+
+.sent-off {
+  margin-top: 8px;
+  color: var(--ink-100);
+}
+
+.sent-table {
+  margin-top: 8px;
+}
+
+.sent-table td {
+  vertical-align: top;
+  padding: 8px 4px;
+}
+
+.sent-feature {
+  width: 120px;
+  font-size: 13px;
+  color: var(--ink-100);
+}
+
+.sent-fields {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-300);
+}
+
+.sent-fields li::first-letter {
+  text-transform: uppercase;
+}
+
+.log-scroll {
+  max-height: 320px;
+  overflow: auto;
+  margin-top: 8px;
+}
+
+.log-table td {
+  padding: 6px 4px;
+}
+
+.log-table td:last-child {
+  width: 72px;
+  padding-left: 18px;
+}
+
+.log-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.log-row:hover,
+.log-row:focus-visible {
+  background: var(--ink-800);
+  outline: none;
+}
+
+.request-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  align-items: baseline;
+  margin: 14px 0;
+}
+
+.json-view {
+  margin: 0;
+  padding: 14px 16px;
+  max-height: 56vh;
+  overflow: auto;
+  background: var(--ink-950);
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-200);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ---------- Report an AI answer ---------- */
+
+.chat-msg-wrap {
+  align-self: flex-start;
+  max-width: 88%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.chat-msg-wrap .chat-msg {
+  max-width: 100%;
+}
+
+.chat-action.chat-report {
+  padding-top: 1px;
+}
+
+.chat-action.chat-report .link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 1;
+  color: var(--ink-400);
+  text-decoration: none;
+}
+
+.chat-action.chat-report .link:hover {
+  color: var(--copper);
+}
+
+/* The flag takes the link's color, not the green of a done action line. */
+.chat-action.chat-report svg {
+  color: inherit;
+}
+
+.report-message {
+  font-size: 13px;
+}
+
+/* ---------- transactions: tags and splits ---------- */
+
+.txn-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.txn-expand svg {
+  transition: transform 0.15s;
+}
+
+.txn-expand.open svg {
+  transform: rotate(90deg);
+}
+
+.txns tbody tr.txn-open td {
+  border-bottom-color: transparent;
+}
+
+.txns tbody tr.txn-detail,
+.txns tbody tr.txn-detail:hover {
+  background: var(--well);
+}
+
+.txns tr.txn-detail td {
+  padding: 4px 16px 14px;
+}
+
+.txn-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.tag.txn-tag {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 10px;
+  color: var(--teal-400);
+  border-color: color-mix(in srgb, var(--teal) 35%, transparent);
+  background: color-mix(in srgb, var(--teal) 6%, transparent);
+}
+
+.btn.ghost.split-btn {
+  padding: 0 7px;
+  color: var(--copper);
+}
+
+.txn-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-field {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+.detail-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-400);
+  padding-top: 7px;
+}
+
+.tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 4px 0 9px;
+  border: 1px solid color-mix(in srgb, var(--teal) 35%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--teal) 6%, transparent);
+  color: var(--teal-400);
+  font-size: 12px;
+}
+
+.tag-chip-x {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: none;
+  padding: 2px;
+  color: var(--ink-400);
+  cursor: pointer;
+}
+
+.tag-chip-x:hover {
+  color: var(--ink-50);
+}
+
+.input.tag-input {
+  height: 26px;
+  width: 140px;
+  font-size: 12px;
+}
+
+.split-editor,
+.split-view {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.split-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.split-row .input,
+.split-row .select {
+  height: 30px;
+  font-size: 12.5px;
+}
+
+.split-row .select {
+  width: 190px;
+}
+
+.input.split-amount {
+  width: 100px;
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.input.split-note {
+  flex: 1;
+  min-width: 80px;
+}
+
+.split-line {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 190px) minmax(0, 150px) minmax(0, 260px) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  padding: 3px 0;
+}
+
+.split-line .num {
+  text-align: right;
+}
+
+.split-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.split-remainder {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--copper);
+}
+
+.split-remainder.done {
+  color: var(--ink-400);
+}
+
+.split-remainder .num {
+  margin-left: 6px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12.5px;
+}
+
+/* ---------- home (pages/Home.tsx): the waterfall's rows, one screen at 900 by 600 ---------- */
+
+/* Where the picker can't fit on one line it wraps, presets above the months, rather than clip the presets. */
+.span-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* "September 2026" whole at the month input's size, so the picker fits beside the title in a 900 px window. */
+.span-picker .month-input {
+  width: 124px;
+  letter-spacing: 0;
+}
+
+.span-picker .segmented button {
+  padding: 6px 8px;
+}
+
+/* Up to 1100 px the picker takes the top bar's second line, which the desktop app's caption buttons leave 520 px of
+   at 900: the picker needs 546 at its full size and All went under the month switch. Tighter, it needs 513. */
+@media (max-width: 1100px) {
+  .span-picker {
+    gap: 6px;
+  }
+
+  .span-picker .segmented button {
+    padding: 6px 5px;
+  }
+}
+
+.span-mark {
+  min-width: 14px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--ink-300);
+  cursor: default;
+}
+
+.page.home {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.home-strip {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  width: 100%;
+  padding: 8px 14px;
+  border: 1px solid var(--ink-700);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  color: var(--ink-100);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.home-strip:hover {
+  border-color: var(--ink-600);
+}
+
+.home-strip .num {
+  font-size: 15px;
+  text-align: left;
+  color: var(--ink-50);
+}
+
+.home-chevron {
+  align-self: center;
+  margin-left: auto;
+  color: var(--ink-400);
+  transition: transform 0.2s;
+}
+
+.home-strip.open .home-chevron {
+  transform: rotate(90deg);
+}
+
+.home .spend-card {
+  margin-top: 10px;
+}
+
+.home-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  min-height: 30px;
+  margin: 12px 0 8px;
+}
+
+/* The view toggle sits on the right, with a headline beside it or without one. */
+.home-bar > .segmented {
+  margin-left: auto;
+}
+
+/* Figures for the span picked before, until the one picked now has its own. */
+.home-stale {
+  opacity: 0.45;
+  transition: opacity 0.15s;
+}
+
+/* The headline takes what the row leaves; in a narrow window the view toggle goes under it. */
+.home-headline {
+  flex: 1 1 260px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 22px;
+  padding-left: 12px;
+  border-left: 2px solid var(--copper);
+}
+
+.home-headline.tone-positive {
+  border-left-color: var(--pos);
+}
+
+.home-headline.tone-negative {
+  border-left-color: var(--neg);
+}
+
+.home-headline-text {
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-100);
+  font: inherit;
+  font-size: 14.5px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+button.home-headline-text {
+  cursor: pointer;
+}
+
+button.home-headline-text:hover {
+  color: var(--ink-50);
+}
+
+.home-headline .report-link {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink-400);
+  text-decoration: none;
+}
+
+.home-headline .report-link:hover {
+  color: var(--copper);
+}
+
+.home-table {
+  container-type: inline-size;
+}
+
+.home-rows {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.home-rows th,
+.home-rows td {
+  height: 32px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--ink-800);
+  font-weight: 400;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.home-rows thead th {
+  height: 26px;
+  border-bottom-color: var(--ink-700);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+
+.home-rows .name {
+  width: 28%;
+  text-align: left;
+}
+
+.home-rows tr.waterfall-row {
+  cursor: pointer;
+}
+
+.home-rows tr.waterfall-row:hover > * {
+  background: var(--row-hover);
+}
+
+.home-rows .row-name {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-50);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.home-rows tr.open > * {
+  background: var(--copper-wash);
+}
+
+.home-rows tr.open .row-name {
+  color: var(--copper);
+}
+
+.home-rows tr.less > *,
+.home-rows tr.part > *,
+.home-rows tr.data > * {
+  background: var(--well);
+  color: var(--ink-200);
+}
+
+.home-rows tr.less .name,
+.home-rows tr.part .name {
+  padding-left: 26px;
+}
+
+/* A changed month's figure beside its close's, under the row it's of. */
+.home-rows tr.closed > * {
+  color: var(--ink-200);
+  font-size: 12.5px;
+}
+
+/* Its name can carry an account's (a return, an outside flow): it wraps within the column, as the account's own line
+   does, before it widens the table past its card. */
+.home-rows tr.closed .name {
+  padding-left: 26px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* A part's, under the part's own line, a step in from it as its own. */
+.home-rows tr.closed.nested .name {
+  padding-left: 42px;
+}
+
+.home-rows tr.data td {
+  height: auto;
+  padding: 7px 10px 7px 26px;
+  font-size: 12.5px;
+  text-align: left;
+  white-space: normal;
+}
+
+.home-rows tr.data .label-muted {
+  margin-right: 12px;
+}
+
+.home-rows tr.extra .muted {
+  margin-left: 6px;
+}
+
+.home-rows .rate {
+  white-space: nowrap;
+}
+
+.focus-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--copper);
+  vertical-align: 1px;
+}
+
+.home-rows .pts {
+  display: block;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--ink-300);
+}
+
+.home-rows .spark-col {
+  width: 84px;
+}
+
+.home-rows .spark-col .link {
+  white-space: nowrap;
+}
+
+.spark {
+  display: block;
+  margin-left: auto;
+}
+
+.spark-bar {
+  fill: var(--ink-500);
+}
+
+.spark-bar.last {
+  fill: var(--ink-200);
+}
+
+/* On the open row's wash and a hovered row, --ink-500 falls under 3:1 in the dark theme. */
+.home-rows tr.open .spark-bar:not(.last):not(.neg),
+.home-rows tr.waterfall-row:hover .spark-bar:not(.last):not(.neg) {
+  fill: var(--ink-400);
+}
+
+.spark-bar.neg {
+  fill: var(--neg);
+}
+
+.spark-line {
+  fill: none;
+  stroke: var(--ink-400);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+
+/* An open row's parts open the Transactions list on exactly their lines; a part's note is the data beside its figures. */
+.home-rows tr.part.drill {
+  cursor: pointer;
+}
+
+.home-rows tr.part.drill:hover > *,
+.home-rows tr.group:hover > * {
+  background: var(--row-hover);
+}
+
+.home-rows tr.part .row-name,
+.home-rows tr.group .row-name {
+  color: var(--ink-100);
+}
+
+.home-rows tr.part.nested .name {
+  padding-left: 42px;
+}
+
+.home-rows .part-note {
+  display: block;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--ink-300);
+  white-space: normal;
+}
+
+/* A part's name is cut short to its column, whole in its title, so a long one (a payee's bank description) never
+   pushes the figures off the window. */
+.home-rows tr.part .name {
+  max-width: 0;
+}
+
+.home-rows .part-name {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.home-rows .part-name > :first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* An Everyday category's tier in Left over, E essential and L lifestyle, in a column of its own at the name's right edge. */
+.home-rows .part-tag {
+  flex: none;
+  margin-left: auto;
+  text-decoration: none;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-300);
+}
+
+/* A category's target goes after its figures, as section 5 draws it; a narrow window has it under the name. */
+.home-rows .part-note.beside {
+  display: none;
+}
+
+.home-rows .part-beside {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+  color: var(--ink-300);
+}
+
+/* A habit's data runs across the figures' columns, wrapping within them so it never widens them. */
+.home-rows .beside-span {
+  max-width: 0;
+  height: auto;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+/* Growth's account lines carry a bank's own account names, often long: up to a width one stays on a line, and past
+   it wraps, inside a word if it must, before it widens the table past its card. The name's column makes room for
+   it, so it's never cut as a part's name is, nor runs under the figures beside it. */
+.home-rows tr.account .name {
+  max-width: none;
+}
+
+.home-rows tr.account .account-name {
+  display: inline-block;
+  width: max-content;
+  max-width: 15em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+
+/* Elective's Committed groups: a row each, what's in it as data beside its figures, opening into its series. */
+.home-rows tr.group {
+  cursor: pointer;
+}
+
+.home-rows tr.group > * {
+  background: var(--well);
+  color: var(--ink-200);
+}
+
+.home-rows tr.group .name {
+  padding-left: 26px;
+}
+
+.home-rows tr.group.open-group .row-name {
+  color: var(--copper);
+}
+
+/* The data wraps within the columns it spans, so it never widens them and is read whole. */
+.home-rows .group-label {
+  max-width: 0;
+  height: auto;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+  color: var(--ink-300);
+}
+
+/* In a narrow window the data goes under the group's name instead. */
+.home-rows tr.group .part-note {
+  display: none;
+}
+
+.home-rows tr.data.switch td,
+.home-rows tr.data.pay td,
+.home-rows tr.data.slot td {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+/* A table or list of the open row's own never widens the rows: in a narrow window it scrolls sideways inside them. */
+.home-rows tr.data.pay > td,
+.home-rows tr.data.slot > td {
+  max-width: 0;
+}
+
+.home-rows tr.data.slot .contrib {
+  margin-top: 0;
+  overflow-x: auto;
+}
+
+.home-rows tr.data.slot .contrib-table {
+  min-width: 440px;
+}
+
+.home-rows tr.data.slot .contrib h2 {
+  font-size: 13px;
+}
+
+.home-rows tr.data .data-to {
+  margin-left: 10px;
+}
+
+/* A drill's figure in a data line, or a payroll and its pay days: links that read as the data they are. */
+.link-quiet {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--ink-600);
+  text-underline-offset: 3px;
+}
+
+.link-quiet:hover {
+  color: var(--copper);
+  text-decoration-color: currentColor;
+}
+
+/* Take-home's pay-day table, and Pay & benefits': a column a check, scrolling sideways past what fits. */
+.pay-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pay-table-wrap + .pay-table-wrap {
+  margin-top: 14px;
+}
+
+.pay-table,
+.home-rows tr.data .pay-table {
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.pay-table th,
+.pay-table td,
+.home-rows tr.data .pay-table th,
+.home-rows tr.data .pay-table td {
+  height: 22px;
+  padding: 0 0 0 20px;
+  border: 0;
+  background: none;
+  color: var(--ink-100);
+  font-weight: 400;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* The row names stay in view while the checks scroll under them, an edge where they pass: a span's or a year's
+   table opens on its latest checks. Their fill is the surface the table sits on: Home's well over the page. */
+.pay-table th:first-child,
+.home-rows tr.data .pay-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 118px;
+  padding-left: 0;
+  padding-right: 12px;
+  background: var(--ink-950);
+  box-shadow: inset -1px 0 0 var(--ink-700);
+  text-align: left;
+}
+
+.pay-table thead th,
+.home-rows tr.data .pay-table thead th {
+  color: var(--ink-300);
+}
+
+.pay-table tr.pay-item > *,
+.home-rows tr.data .pay-table tr.pay-item > * {
+  color: var(--ink-300);
+}
+
+.pay-table .pay-tie,
+.home-rows tr.data .pay-table .pay-tie {
+  min-width: 18px;
+  padding-left: 10px;
+  color: var(--pos);
+}
+
+.pay-days {
+  padding: 14px 16px;
+}
+
+/* On Pay & benefits the table sits on a card. */
+.pay-days .pay-table th:first-child {
+  background: var(--card-solid);
+}
+
+/* A long span's heading and Per month's wrap before they widen the rows past the window: at 900 px a 12M or All
+   span, with Elective's groups open, would otherwise scroll sideways. */
+@container (max-width: 720px) {
+  .home-rows thead th:nth-child(2),
+  .home-rows thead th.per-month {
+    white-space: normal;
+  }
+}
+
+/* Narrow: the sparklines and Per month give way to the figures. */
+@container (max-width: 560px) {
+  .home-rows .spark-col,
+  .home-rows .per-month {
+    display: none;
+  }
+
+  .home-rows {
+    font-size: 13px;
+  }
+
+  .home-rows th,
+  .home-rows td {
+    padding: 0 4px;
+  }
+
+  .home-rows tbody .name {
+    white-space: normal;
+  }
+
+  .home-rows tr.account .account-name {
+    width: auto;
+    max-width: none;
+  }
+
+  .home-rows tr.less .name,
+  .home-rows tr.part .name,
+  .home-rows tr.closed .name,
+  .home-rows tr.group .name,
+  .home-rows tr.data td {
+    padding-left: 14px;
+  }
+
+  .home-rows tr.part.nested .name,
+  .home-rows tr.closed.nested .name {
+    padding-left: 24px;
+  }
+
+  .home-rows .group-label {
+    display: none;
+  }
+
+  .home-rows tr.group .part-note,
+  .home-rows .part-note.beside {
+    display: block;
+  }
+
+  .home-rows .beside-span .part-beside {
+    display: none;
+  }
+
+  /* Names wrap here instead, so a one-word name is never cut. */
+  .home-rows tr.part .name {
+    max-width: none;
+  }
+}
+
+/* ---------- a narrow window (down to the 900 px minimum) ---------- */
+
+@media (max-width: 1100px) {
+  :root {
+    --sidebar-w: 188px;
+  }
+
+  .brand {
+    padding: 0 14px 0 16px;
+  }
+
+  .nav {
+    padding: 0 8px;
+  }
+
+  .nav-item {
+    gap: 10px;
+    padding: 9px 10px;
+  }
+
+  .nav-item.nav-sub {
+    padding-left: 35px;
+  }
+
+  .sidebar-footer {
+    padding: 14px 16px 16px;
+  }
+
+  .nav-item {
+    white-space: nowrap;
+  }
+
+  .nav::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  /* Controls that don't fit beside the title and the caption buttons take a second line, on the right. */
+  .topbar {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 8px;
+    height: auto;
+    min-height: var(--topbar-h);
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 20px;
+  }
+
+  .page {
+    padding: 24px 20px 56px;
+  }
+
+  .tile {
+    padding: 18px 18px 16px;
+  }
+
+  .tile-value {
+    font-size: 30px;
+  }
+
+  .stat-strip.five > :nth-child(5) {
+    grid-column: span 2;
+  }
+
+  .review-layout {
+    grid-template-columns: minmax(0, 1fr) 240px;
+  }
+
+  /* Transactions: tighter columns, the account under the merchant. */
+  .txns th,
+  .txns td {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .txns col.c-date {
+    width: 104px;
+  }
+
+  .txns col.c-category {
+    width: 166px;
+  }
+
+  .txns col.c-bucket {
+    width: 114px;
+  }
+
+  .txns col.c-amount {
+    width: 100px;
+  }
+
+  /* The account column takes no room but stays a column, so an open row's colspan still matches. */
+  .txns col.c-account {
+    width: 0;
+  }
+
+  .txns th.c-account,
+  .txns td.c-account {
+    padding: 0;
+    font-size: 0;
+    overflow: hidden;
+  }
+
+  /* An open split: its parts' columns and the editor's fields share the width. */
+  .split-line {
+    grid-template-columns: 84px minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1.4fr) 66px;
+    gap: 8px;
+  }
+
+  .split-row {
+    gap: 6px;
+  }
+
+  .split-row .select {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .input.split-amount {
+    width: 84px;
+  }
+
+  .input.split-note {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .txn-account-under {
+    display: block;
+    margin-top: 1px;
+    font-size: 12px;
+  }
+
+  .asset-row.insurance-row {
+    grid-template-columns: minmax(90px, 1.6fr) 76px repeat(4, minmax(64px, 1fr)) 108px;
+    gap: 10px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .care-row {
+    grid-template-columns: 18px 84px minmax(0, 1.7fr) 64px minmax(0, 1fr) 76px minmax(0, 1.3fr) 120px;
+    gap: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .asset-row.tax-row {
+    grid-template-columns: 76px repeat(6, minmax(64px, 1fr)) minmax(0, 1.2fr);
+    gap: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .tax-check-row {
+    grid-template-columns: minmax(0, 1.6fr) repeat(4, minmax(68px, 1fr)) 44px minmax(96px, 1fr);
+    gap: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  /* The venture's name keeps its room: the count of its transactions gives way. */
+  .bucket-table .asset-row {
+    grid-template-columns: minmax(0, 2.4fr) minmax(110px, 1.2fr) repeat(4, minmax(72px, 1fr));
+    gap: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .bucket-table .asset-row > :nth-child(3) {
+    display: none;
+  }
+
+  .credit-trade-row {
+    grid-template-columns: minmax(0, 2fr) 72px 120px minmax(0, 1.3fr) 72px 72px minmax(0, 1.3fr);
+    gap: 8px;
+  }
+
+  .debtlist-row {
+    grid-template-columns: minmax(0, 1.8fr) 96px 76px 56px minmax(0, 1.3fr) 84px minmax(0, 1.2fr);
+    gap: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .asset-row.goal-row {
+    grid-template-columns: minmax(100px, 2fr) minmax(70px, 1.3fr) repeat(2, minmax(62px, 1fr)) 100px minmax(62px, 1fr) 84px;
+    gap: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .asset-row.goal-row > :nth-child(5),
+  .asset-row.goal-row > :nth-child(7) {
+    padding-left: 8px;
+  }
+
+  .holding-row {
+    grid-template-columns: 60px minmax(0, 1.4fr) repeat(8, minmax(52px, 1fr));
+    gap: 6px;
+    padding: 9px 12px 9px 24px;
+    font-size: 11.5px;
+  }
+
+  .holding-row.all {
+    padding-left: 12px;
+    grid-template-columns: 70px minmax(0, 1.6fr) repeat(7, minmax(56px, 1fr));
+  }
+
+  .sheet-row {
+    grid-template-columns: minmax(0, 1fr) 84px 96px;
+    gap: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+/* Under 1000 px: four-figure strips in two rows, and the property and venture pages' pairs of cards one above the
+   other. */
+@media (max-width: 1000px) {
+  .stat-strip:not([style]):not(.three):not(.five):not(.plan-strip) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* On a phone the venture list keeps each venture's name, kind and share, its total and its position, and Net worth's
+   list puts what you owe under what you own, so each row has room for its name. */
+@media (max-width: 700px) {
+  .sheet-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Accounts at a phone's width: the name and its facts (a cash account's role first) take the row, and the balance
+     and the buttons go under them. */
+  .list-row.acct-row {
+    flex-wrap: wrap;
+  }
+
+  .list-row.acct-row > .grow {
+    flex-basis: 100%;
+  }
+
+  /* The balance starts its line under the name, as wide as its figure, and the buttons follow it. */
+  .list-row.acct-row > .acct-balance {
+    width: auto;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .list-row.acct-row > .btn.acct-balance {
+    padding-left: 0;
+  }
+
+  .bucket-table .asset-row {
+    grid-template-columns: minmax(0, 1fr) repeat(2, minmax(72px, auto));
+    gap: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .bucket-table .asset-row > :nth-child(2),
+  .bucket-table .asset-row > :nth-child(3),
+  .bucket-table .asset-row > :nth-child(4),
+  .bucket-table .asset-row > :nth-child(5) {
+    display: none;
+  }
+}
+
+/* ---------- a phone's width (the web app at 700 px and under; shellMenu.ts NARROW) ---------- */
+
+/* The sidebar gives way to a top bar with the app's name, the page and a menu control, which opens the sidebar over
+   the page. Every page keeps 16 px at each side. */
+@media (max-width: 700px) {
+  /* A desktop browser's scrollbar sits in a page's right 16 px, taking its width from the padding there; a phone's
+     sits over the page and takes none. Inside the main column 100cqw is the column less its scrollbar. */
+  .app {
+    --page-end: max(6px, calc(16px - (100vw - 100cqw)));
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100dvh;
+  }
+
+  /* In the desktop app (zoomed until the page is under 700 px) the top bar is the window's title bar, as the page's own
+     bar is when wider: it drags the window and keeps clear of the caption buttons drawn over its right edge. A browser
+     has no title bar area, so it keeps 16 px there (web.css and demo.css take the drag off). */
+  .shell-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 52px;
+    padding: 0 max(16px, calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 8px)) 0 max(8px, env(titlebar-area-x, 0px));
+    border-bottom: 1px solid var(--ink-700);
+    background: color-mix(in srgb, var(--ink-950) 92%, transparent);
+    -webkit-app-region: drag;
+    user-select: none;
+  }
+
+  .shell-bar button {
+    -webkit-app-region: no-drag;
+  }
+
+  /* With the menu open nothing under the scrim drags the window, so a press there closes the menu. */
+  .app.menu-open .shell-bar,
+  .app.menu-open > .main .topbar {
+    -webkit-app-region: no-drag;
+  }
+
+  .shell-bar .brand-logo {
+    width: 22px;
+    height: 22px;
+  }
+
+  .shell-bar .brand-name {
+    font-size: 16px;
+  }
+
+  /* Review's count on the menu control's corner. */
+  .shell-menu {
+    position: relative;
+  }
+
+  .shell-badge {
+    position: absolute;
+    top: -3px;
+    right: -7px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 9.5px;
+  }
+
+  .shell-page {
+    margin-left: auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-300);
+  }
+
+  /* The sidebar, whole, over the page from the left; the rest of the page dims and a press there closes it. */
+  .sidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 30;
+    width: min(280px, calc(100% - 48px));
+    background: var(--ink-950);
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+
+  /* It slides in as it opens, and goes at once as it closes or as the window narrows. */
+  .app.menu-open .sidebar {
+    transform: none;
+    visibility: visible;
+    box-shadow: 0 0 40px var(--shadow);
+    transition: transform 0.2s ease-out;
+  }
+
+  .app.menu-open::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 25;
+    background: var(--scrim);
+  }
+
+  .nav-item {
+    padding-top: 11px;
+    padding-bottom: 11px;
+  }
+
+  /* A page's own bar scrolls with its page, under the top bar that stays: its title, then its controls on the lines
+     they need, from the left. It keeps the page's 16 px (the web's and the demo's own rules keep 32 at the right). */
+  .app > .main .topbar {
+    position: static;
+    justify-content: flex-start;
+    padding: 12px var(--page-end) 12px 16px;
+    row-gap: 10px;
+  }
+
+  .topbar h1 {
+    order: -2;
+    font-size: 22px;
+  }
+
+  /* A page opened at its debt plan shows its heading, with no bar stuck over it. */
+  #payoff {
+    scroll-margin-top: 8px;
+  }
+
+  .page {
+    padding: 20px var(--page-end) 48px 16px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  /* Home's span: the presets on the title's line with the span's mark beside the title, the months on a line of
+     their own. */
+  .topbar .span-picker {
+    display: contents;
+  }
+
+  .topbar .span-mark {
+    order: -1;
+  }
+
+  /* Any span picker's months take the line they're on, with its mark beside them where there's one, and narrow to it
+     (320 px leaves them 278), so neither arrow goes past the page's edge. */
+  .span-picker .month-switch {
+    flex: 1 1 260px;
+    min-width: 0;
+  }
+
+  .span-picker .month-input {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 2px 0 6px;
+  }
+
+  /* At 320 px a month is read whole beside Net worth's mark too. */
+  @media (max-width: 340px) {
+    .span-picker .month-input {
+      padding-left: 4px;
+      font-size: 10px;
+    }
+  }
+
+  /* The headline is read whole, over the lines it needs. */
+  .home-headline-text {
+    white-space: normal;
+  }
+
+  /* A Committed group's data is under its name here (rows 560 px and narrower); the cell it had beside the figures
+     stays, empty, so the row's fill and its line run across the columns the data left. A row paints only behind its
+     cells. */
+  @container (max-width: 560px) {
+    .home-rows tr.group > .group-label {
+      display: table-cell;
+      padding: 0;
+      font-size: 0;
+    }
+  }
+
+  /* The rows' headings wrap, so the figures keep their columns inside the page. */
+  .home-rows thead th {
+    white-space: normal;
+    letter-spacing: 0.06em;
+    line-height: 1.25;
+    vertical-align: bottom;
+    padding-bottom: 4px;
+  }
+
+  /* Under 300 px of rows (a 320 px phone) the figures tighten and a category's tier goes under its name when the two
+     don't fit a line, so Elective's and Left over's drills keep Δ 3 mo inside the page. */
+  @container (max-width: 300px) {
+    .home-rows {
+      font-size: 12px;
+    }
+
+    .home-rows th,
+    .home-rows td {
+      padding: 0 3px;
+    }
+
+    .home-rows .part-name {
+      flex-wrap: wrap;
+      column-gap: 6px;
+    }
+  }
+
+  /* Tiles two to a line, the lead figure of a strip that has one across the top. A strip that sets its own columns
+     (Net worth's, Investments', a property's) sets them inline, which only !important outranks. */
+  .stat-strip:not(.plan-strip) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .stat-strip[style] > :first-child:nth-last-child(odd),
+  .stat-strip.three:not(.plan-strip) > :first-child,
+  .stat-strip.five > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .stat-strip.five > :nth-child(5) {
+    grid-column: auto;
+  }
+
+  .tile {
+    padding: 16px 16px 14px;
+  }
+
+  /* A five-tile strip's tiles are as wide here as any other's, so their figures are the same size. */
+  .tile-value,
+  .stat-strip.five .tile-value {
+    font-size: 26px;
+  }
+
+  /* Wide lists: each row's name on a line of its own and its figures under it three to a line, the head row laid out
+     the same so each heading sits over its figure. */
+  .asset-row.goal-row,
+  .asset-row.insurance-row,
+  .asset-row.tax-row,
+  .asset-row.invest-row,
+  .asset-row.credit-report-row,
+  .tax-check-row,
+  .credit-trade-row,
+  .credit-score-row,
+  .credit-card-row,
+  .credit-inquiry-row,
+  .insurance-work-row,
+  .debtlist-row,
+  .free-row,
+  .other-row,
+  .returns-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px 10px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  /* Investments' returns set their columns inline. */
+  .returns-row[style] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .asset-row.goal-row > :first-child,
+  .asset-row.insurance-row > :first-child,
+  .asset-row.tax-row > :first-child,
+  .asset-row.invest-row > :first-child,
+  .asset-row.credit-report-row > :first-child,
+  .tax-check-row > :first-child,
+  .credit-trade-row > :first-child,
+  .credit-score-row > :first-child,
+  .credit-card-row > :first-child,
+  .credit-inquiry-row > :first-child,
+  .insurance-work-row > :first-child,
+  .debtlist-row > :first-child,
+  .free-row > :first-child,
+  .other-row > :first-child,
+  .returns-row > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  /* A venture's money by year and by payee, and its assets: the name on its line, its three figures under it. */
+  .money-row:not(.pair):not(.owner-line):not(.owner-money) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2px 10px;
+  }
+
+  /* Its assets sit 14 px in, as the other wide lists do. */
+  .money-row.venture-asset {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .money-row:not(.pair):not(.owner-line):not(.owner-money) > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  /* A list's name is read whole, over the lines it needs: a policy's, a venture's, a cost's place and card, and a debt's
+     or a property's line under its name, which 320 px cut short. */
+  .list-row .grow.truncate,
+  .money-row .truncate,
+  .asset-row.insurance-row > .truncate,
+  .asset-card > .label-muted.truncate,
+  .bucket-name > .truncate,
+  .care-row > .truncate {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* Spendable's figure and its day go over two lines rather than past the strip's edge. */
+  .home-strip .num {
+    min-width: 0;
+    white-space: normal;
+  }
+
+  /* Investments' returns head has no name to show. */
+  .returns-row.head > :first-child:empty {
+    display: none;
+  }
+
+  /* Contributions: the plan on its line, then its election and what it takes a paycheck, then the year so far and by
+     Dec 31, under the same headings. Home's compact list fits the same way rather than scroll. */
+  .contrib-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 12px;
+  }
+
+  .contrib-row > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .contrib-row .truncate {
+    white-space: normal;
+  }
+
+  .home-rows tr.data.slot .contrib-table {
+    min-width: 0;
+  }
+
+  /* A limit's name, then what's planned by Dec 31 and the room left, each read whole. */
+  .contrib-limit .row {
+    flex-wrap: wrap;
+  }
+
+  .contrib-limit .num {
+    white-space: normal;
+    text-align: left;
+  }
+
+  /* A large figure's side figure (the HSA's limit, a tax year's) goes under it. */
+  .tax-hero-top {
+    flex-wrap: wrap;
+    row-gap: 14px;
+  }
+
+  .tax-hero-side {
+    flex: 1 1 100%;
+    min-width: 0;
+    padding: 12px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--ink-700);
+  }
+
+  .tax-hero-value {
+    font-size: 40px;
+  }
+
+  /* A section's heading keeps its line; what's beside it (a count, the debt plan's order, a filter) goes under it
+     when it doesn't fit, read whole. */
+  .asset-group-head {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  .plan-head > .label-muted {
+    white-space: normal;
+  }
+
+  /* A promo rate ("0.0% to Mar 2027") wraps in its column rather than run into the next one. */
+  .debt-row > :nth-child(3) {
+    white-space: normal;
+  }
+
+  /* Pay yourself back: the box and the cost's day and place, then its kind, card and amount, then its receipt and HSA
+     answer, the head row the same. */
+  .care-row {
+    grid-template-columns: 18px repeat(3, minmax(0, 1fr));
+    gap: 4px 10px;
+  }
+
+  .care-row > :nth-child(1) {
+    grid-row: 1 / 4;
+    align-self: start;
+  }
+
+  .care-row > :nth-child(3) {
+    grid-column: 3 / -1;
+  }
+
+  .care-row > :nth-child(4),
+  .care-row > :nth-child(5),
+  .care-row > :nth-child(6) {
+    grid-row: 2;
+  }
+
+  .care-row > :nth-child(4) {
+    grid-column: 2;
+  }
+
+  .care-row > :nth-child(7),
+  .care-row > :nth-child(8) {
+    grid-row: 3;
+  }
+
+  .care-row > :nth-child(7) {
+    grid-column: 2 / 4;
+  }
+
+  /* A line of fields and buttons (a key and its buttons, a folder and its actions) goes onto the lines it needs, a
+     field or a folder's path taking what its line leaves. A field that sets its flex inline (the API key, the license
+     key, a value's figure) takes the same, which only !important outranks. */
+  .main .row {
+    flex-wrap: wrap;
+  }
+
+  .main .row > .input,
+  .main .row > .data-path {
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+
+  .main .row > .input[style] {
+    flex: 1 1 160px !important;
+  }
+
+  .cat-table .select {
+    min-width: 96px;
+  }
+
+  /* A table's choice (an AI route's model) is read whole, the table scrolling in its box for it. */
+  .cat-table:not(.categories) .select {
+    min-width: max-content;
+  }
+
+  /* Review: the conversation over the open items, the documents and what's remembered. */
+  .main {
+    container-type: size;
+  }
+
+  .app > .main .review-layout {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+  }
+
+  /* A conversation under way takes the height the column has below the page's own bar, its reply box at its foot in
+     view: the column holds still, and what's under the conversation scrolls up into the layout's own box, which is
+     the size the conversation takes its height from. */
+  .main:has(> .review-layout .chat-thread) {
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+    scrollbar-gutter: auto;
+  }
+
+  .main:has(> .review-layout .chat-thread) > .topbar {
+    flex: none;
+  }
+
+  .main:has(> .review-layout .chat-thread) > .review-layout {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    container-type: size;
+  }
+
+  .chat {
+    border-right: 0;
+    border-bottom: 1px solid var(--ink-700);
+  }
+
+  .chat:has(.chat-thread) {
+    height: 100cqh;
+  }
+
+  .chat-scroll {
+    padding: 20px var(--page-end) 20px 16px;
+  }
+
+  .chat-composer {
+    padding: 10px var(--page-end) 12px 16px;
+  }
+
+  .review-side {
+    overflow-y: visible;
+    padding: 20px var(--page-end) 48px 16px;
+  }
+
+  /* Nothing hovers on a phone: a remembered fact's button shows. */
+  .review-side .fact .btn {
+    opacity: 1;
+  }
+
+  /* The setup wizard: its panel the page's width less 16 px a side, each folder's name over its path. */
+  .wizard {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 24px 16px;
+  }
+
+  .wizard-panel {
+    width: 100%;
+    padding: 22px 18px 18px;
+  }
+
+  .wizard-name,
+  .wizard-panel h2 {
+    font-size: 28px;
+  }
+
+  .wizard-figure {
+    font-size: 48px;
+  }
+
+  .wizard-row {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .wizard-label {
+    width: 100%;
+  }
+
+  .wizard-row code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .wizard-actions {
+    flex-wrap: wrap;
+  }
+
+  /* The calendar's month: each day's items as bars in their kind's color, opened by a tap; the next 30 days under the
+     month name them whole. */
+  .cal-card {
+    padding: 8px;
+  }
+
+  .cal-weekday {
+    padding: 6px 0;
+    text-align: center;
+    letter-spacing: 0.06em;
+  }
+
+  /* Each bar is drawn 6 px tall in a 12 px press target, the targets touching, so a press meant for a bar lands on it
+     rather than on the day around it (which starts a reminder). */
+  .cal-cell {
+    min-height: 58px;
+    padding: 4px 3px 6px;
+    gap: 0;
+  }
+
+  .cal-chip {
+    height: 12px;
+    padding: 3px 0;
+    border-left: 0;
+    background: var(--ink-500) content-box;
+  }
+
+  .cal-chip > * {
+    display: none;
+  }
+
+  .cal-chip.reminder {
+    background: var(--copper) content-box;
+  }
+
+  .cal-chip.income {
+    background: var(--pos) content-box;
+  }
+
+  .cal-chip.bill {
+    background: var(--neg) content-box;
+  }
+
+  .cal-chip.transfer {
+    background: var(--ink-400) content-box;
+  }
+
+  .cal-more {
+    padding-left: 0;
+  }
+
+  /* A value's day on one line beside its figure and where it came from (the figure sets its own width inline). */
+  .point-list .list-row {
+    gap: 8px;
+  }
+
+  .point-list .list-row > .num[style] {
+    width: auto !important;
+  }
+
+  .point-list .list-row > .mono {
+    white-space: nowrap;
+  }
+
+  /* An account's facts are read whole. */
+  .list-row.acct-row .label-muted.truncate {
+    white-space: normal;
+  }
+
+  /* Settings' and the web's tables scroll sideways inside their card past what fits; a path is read whole. A table
+     with no head row fills the card when it fits, its figures at the right edge as wider (a head row's table stays one
+     table, so its headings keep over their columns). */
+  .cat-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .cat-table:not(:has(> thead)) > tbody {
+    display: table;
+    width: 100%;
+  }
+
+  .data-path.truncate,
+  .tier-rows code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* Categories a block each: the name, its type and its delete button on a line, its hint for the AI under them. */
+  .cat-table.categories colgroup {
+    display: none;
+  }
+
+  .cat-table.categories tbody {
+    display: block;
+  }
+
+  .cat-table.categories tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 118px 32px;
+    column-gap: 4px;
+    padding: 4px 0;
+    border-top: 1px solid var(--ink-700);
+  }
+
+  .cat-table.categories tr:first-child {
+    border-top: 0;
+  }
+
+  .cat-table.categories td {
+    padding: 0;
+    border-top: 0;
+  }
+
+  .cat-table.categories td:nth-child(3) {
+    grid-area: 2 / 1 / 3 / -1;
+  }
+
+  .cat-table.categories td:nth-child(4) {
+    grid-area: 1 / 3;
+  }
+
+  /* A payroll's name wraps in the column that stays in view, leaving the checks more of the width. */
+  .pay-table th.pay-name,
+  .home-rows tr.data .pay-table th.pay-name {
+    min-width: 0;
+    max-width: 120px;
+    white-space: normal;
+  }
+
+  .pay-table th:first-child,
+  .home-rows tr.data .pay-table th:first-child {
+    min-width: 96px;
+  }
+
+  /* A holding's symbol and its name share the first line. */
+  .holding-row > :nth-child(2) {
+    grid-column: 2 / -1;
+  }
+
+  /* Text that follows a column of figures starts at its own column's edge here. */
+  .asset-row.goal-row > :nth-child(5),
+  .asset-row.goal-row > :nth-child(7),
+  .asset-row.insurance-row > :last-child,
+  .asset-row.tax-row > :last-child,
+  .credit-score-row > :nth-child(4),
+  .credit-card-row > :last-child,
+  .credit-trade-row > :last-child {
+    padding-left: 0;
+  }
+
+  /* A holding's figures three to a line under its symbol and name, indented under its account's row; the holdings across
+     every account (which set their own columns) aren't under one. */
+  .holding-row,
+  .holding-row.all {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px 10px;
+    padding-right: 14px;
+  }
+
+  .holding-row {
+    padding-left: 24px;
+  }
+
+  .holding-row.all {
+    padding-left: 14px;
+  }
+
+  /* Transactions' filters each take what the line has, two to a line. */
+  .toolbar .input[type='search'] {
+    width: 100%;
+  }
+
+  .toolbar .select {
+    flex: 1 1 140px;
+    min-width: 0;
+    max-width: none;
+  }
+
+  /* Transactions a block each: the date with its buttons, the merchant (its bank text and account under it) with the
+     amount, then its category and venture to change. */
+  .txns colgroup,
+  .txns thead,
+  .txns td.c-account {
+    display: none;
+  }
+
+  table.txns,
+  .txns tbody {
+    display: block;
+  }
+
+  .txns tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    column-gap: 10px;
+    padding: 8px 12px 6px;
+    border-bottom: 1px solid var(--ink-700);
+  }
+
+  .txns tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .txns td,
+  .txns td:last-child {
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .txns td.txn-date {
+    grid-area: 1 / 1 / 2 / 3;
+  }
+
+  .txns tr > td:last-child {
+    grid-area: 1 / 3;
+  }
+
+  .txns tr > td:nth-child(2) {
+    grid-area: 2 / 1 / 3 / 3;
+  }
+
+  .txns td.num {
+    grid-area: 2 / 3;
+    align-self: start;
+    font-size: 14px;
+  }
+
+  .txns tr > td:nth-child(3) {
+    grid-area: 3 / 1 / 4 / 4;
+    margin-top: 4px;
+  }
+
+  .txns tr > td:nth-child(4):not(.c-account) {
+    grid-area: 3 / 2 / 4 / 4;
+    margin-top: 4px;
+  }
+
+  /* With a venture column the category leaves it the end of its line. */
+  .txns tr:has(> td:nth-child(4):not(.c-account)) > td:nth-child(3) {
+    grid-column: 1 / 2;
+  }
+
+  .txns .txn-actions {
+    justify-content: flex-end;
+  }
+
+  .txns tr.txn-detail > td,
+  .txns tr > td.empty {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    padding: 4px 0;
+  }
+
+  /* A merchant's name and its bank text are read whole, over the lines they need. */
+  .txns .truncate {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}

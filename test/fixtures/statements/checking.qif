@@ -1,0 +1,54 @@
+!Type:Bank
+D9/30'26
+T1,000.00
+CX
+POpening Balance
+L[Everyday Checking]
+^
+D10/1'26
+T2,500.00
+PACME PAYROLL
+LSalary
+^
+D10/ 3'26
+U-4.50
+T-4.50
+PBlue Bottle
+MCoffee
+LDining
+^
+D10/3/2026
+T-4.50
+PBlue Bottle
+MCoffee
+LDining
+^
+D10/5/26
+T-1,850.00
+N1042
+PRiverside Apartments
+ARiverside Apartments
+A12 River Rd
+LRent
+^
+D10/7/26
+T-120.00
+PCostco
+SGroceries
+EFood
+$-80.00
+SHousehold
+$-40.00
+^
+D13/45/26
+T-9.99
+PBad date
+^
+D10/9/26
+Tabc
+PBad amount
+^
+D2026-10-11
+T-15.99
+PNetflix
+LSubscriptions

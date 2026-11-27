@@ -1,0 +1,101 @@
+# The installer. npm run dist:open (scripts/dist-open.cjs) makes the release build for the computer it runs on;
+# npm run dist is the plain Windows installer, unsigned.
+# The Electron binary's fuses are flipped in scripts/fuses.cjs after packing.
+
+# The app id is permanent: changing it makes Windows and macOS treat the next
+# install as a new app (its own uninstall entry, shortcuts and update identity).
+# It names the company's domain and stays as it is when the app's name changes.
+appId: ai.loboslabs.financetracker
+productName: Finance Tracker
+copyright: Copyright © 2026 Lobos Labs, Inc.
+asar: true
+npmRebuild: false
+electronLanguages:
+  - en-US
+directories:
+  buildResources: build
+  output: dist
+# Production dependencies from node_modules (papaparse, the Anthropic SDK,
+# electron-updater, the SQLite driver) are added by electron-builder on top of
+# these. The driver (better-sqlite3-multiple-ciphers, SQLite with
+# SQLite3MultipleCiphers, src/main/sqlite.ts) ships every platform's prebuilt
+# Node-API binary and its C sources: only the binary for the build's platform
+# (the building machine's) and arch goes in, unpacked beside the asar, since a
+# .node can't load from inside one. Node-API, so the same binary runs on any
+# Electron (npmRebuild stays off). A universal Mac build would need both Mac
+# binaries kept (not built yet). The patterns stay here, not under win: or
+# mac:, where a list of exclusions alone would make electron-builder pack the
+# whole project.
+files:
+  - out/**
+  - resources/**
+  - package.json
+  - "!node_modules/better-sqlite3-multiple-ciphers/{deps,src}/**"
+  - "!node_modules/better-sqlite3-multiple-ciphers/binding.gyp"
+  - "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/!(${platform}-${arch}).node"
+  - "!node_modules/node-addon-api/**"
+asarUnpack:
+  - "node_modules/better-sqlite3-multiple-ciphers/prebuilds/*.node"
+afterPack: ./scripts/fuses.cjs
+# The license and the third-party notices go in the app's resources folder
+# (Contents/Resources on macOS, resources on Windows), beside Electron's own
+# license files. Not extraFiles: on macOS those land at the top of Contents,
+# where code signing treats a file as code. The SQLite driver's SHA-2 code is
+# BSD-3-Clause, whose notice has to travel with the binaries. A file that
+# isn't there is skipped.
+extraResources:
+  - from: LICENSE
+    to: LICENSE
+  - from: THIRD_PARTY_NOTICES
+    to: THIRD_PARTY_NOTICES
+publish: null
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icon.ico
+  # A signed build signs the unpacked driver binary too (by default only .exe files are).
+  signExts:
+    - .node
+  artifactName: ${name}-Setup-${version}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  # No folder page: every update and the uninstaller empty the install folder, so it is always the app's own.
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Finance Tracker
+  deleteAppDataOnUninstall: false
+
+# macOS: a dmg (what people download) and a zip (what electron-updater installs,
+# listed in latest-mac.yml) for each arch, so one run on a Mac makes all four
+# and one latest-mac.yml naming both zips. Each arch is packed on its own, so
+# the files pattern above keeps that arch's SQLite driver binary
+# (darwin-arm64.node or darwin-x64.node); the fuses are flipped on each before
+# it is signed. Signing takes a Developer ID Application certificate from
+# CSC_LINK when there is one, under the hardened runtime with these
+# entitlements; notarization follows only when APPLE_API_KEY, APPLE_API_KEY_ID
+# and APPLE_API_ISSUER (or APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and
+# APPLE_TEAM_ID) are set, and electron-builder skips it otherwise. npm run
+# dist:open (scripts/dist-open.cjs) signs ad hoc when there is no certificate.
+mac:
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  icon: resources/icon.png
+  category: public.app-category.finance
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  artifactName: ${name}-${version}-${arch}.${ext}
+dmg:
+  artifactName: ${name}-${version}-${arch}.${ext}

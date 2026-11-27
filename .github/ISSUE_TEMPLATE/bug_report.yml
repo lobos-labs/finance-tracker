@@ -1,0 +1,48 @@
+name: Bug report
+description: A wrong number, a broken screen, a bank file that won't import.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Issues are public. Take your own names, account numbers and amounts out of anything you post, screenshots included. A made-up file, or the app's sample data (the last step of setup, **Load sample data**), shows most problems.
+
+        A security problem goes to the **Security** tab's **Report a vulnerability**, not here.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Settings → Data shows it.
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS on Apple silicon
+        - macOS on Intel
+        - A build from source
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to see it again
+      description: The steps from a fresh start or from the sample data, if you can find them.
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Settings → Data → Copy diagnostics, pasted here. Read it over first; a folder path in it can carry your user name.
+      render: text
